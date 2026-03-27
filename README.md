@@ -2,8 +2,8 @@
 ### A Rigorous Data Science Account of UK Retail Structural Collapse
 
 **Venkata Prudhvi Kante**  
-Data & Reporting Scientist · South West Water, Exeter, UK  
-MSc Business Analytics (Distinction) · University of Exeter
+Data Scientist  
+MSc Business Analytics (Distinction)
 
 📧 prudhvi.ncsnlr@gmail.com
 
@@ -73,7 +73,7 @@ data/ - download instructions
 
 ## Citation
 
-Kante, V. P. (2026). Why Your High Street Is Emptying: A Rigorous Data Science Account of UK Retail Structural Collapse. Preprint, South West Water / University of Exeter.
+Kante, V. P. (2026). Why Your High Street Is Emptying: A Rigorous Data Science Account of UK Retail Structural Collapse. Independent Research Preprint.
 
 ---
 
