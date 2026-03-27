@@ -3,7 +3,7 @@
 
 **Venkata Prudhvi Kante**  
 Data Scientist  
-MSc Business Analytics (Distinction)
+MSc Business Analytics
 
 📧 prudhvi.ncsnlr@gmail.com
 
