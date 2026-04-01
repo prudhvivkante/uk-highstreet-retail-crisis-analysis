@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>UK Retail Dissolution — Model Comparison & Forecast</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; max-width: 920px; margin: 0 auto; padding: 20px; background: #fff; color: #222; }
+  h2 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+  .sub { font-size: 12px; color: #666; margin-bottom: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .card { background: #f5f5f3; border-radius: 8px; padding: 14px; }
+  .card .label { font-size: 11px; color: #666; margin-bottom: 3px; }
+  .card .val { font-size: 20px; font-weight: 600; }
+  .card .note { font-size: 10px; color: #888; margin-top: 3px; }
+  .model-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
+  .model-table th { text-align: left; padding: 8px 10px; background: #f0efeb; font-weight: 600; border-bottom: 1px solid #ddd; }
+  .model-table td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+  .model-table tr.winner td { background: #eef6e6; font-weight: 600; }
+  .model-table tr.best-oos td { background: #fff5e6; }
+  .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .badge-green { background: #d4edda; color: #1e5c2e; }
+  .badge-amber { background: #fff3cd; color: #6b4c00; }
+  .badge-blue  { background: #d6eaf8; color: #0a3d6b; }
+  .btn-group { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  button { font-size: 12px; padding: 5px 14px; border-radius: 6px; border: 1px solid #ccc; background: #fff; cursor: pointer; }
+  button.active { background: #222; color: #fff; border-color: #222; }
+  .chart-wrap { position: relative; width: 100%; height: 340px; margin-bottom: 8px; }
+  .legend { display: flex; gap: 12px; font-size: 11px; color: #666; flex-wrap: wrap; margin-bottom: 16px; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .insight { border-left: 3px solid #185FA5; padding: 10px 14px; background: #f0f6fb; border-radius: 0 6px 6px 0; font-size: 12px; color: #333; line-height: 1.6; margin-bottom: 12px; }
+  .insight strong { color: #185FA5; }
+  @media(prefers-color-scheme:dark){
+    body{background:#1a1a18;color:#c2c0b6}
+    .card{background:#2a2a28} .card .label,.card .note{color:#888}
+    .model-table th{background:#2e2e2c;color:#c2c0b6} .model-table td{border-color:#333}
+    .model-table tr.winner td{background:#1e2e1a} .model-table tr.best-oos td{background:#2e2a16}
+    .badge-green{background:#1e3a22;color:#7ec47e} .badge-amber{background:#3a2e10;color:#d4a44c}
+    .badge-blue{background:#0a2040;color:#7ab8f5}
+    button{background:#2a2a28;border-color:#444;color:#c2c0b6} button.active{background:#c2c0b6;color:#1a1a18;border-color:#c2c0b6}
+    .insight{background:#0d1f30;border-color:#3B8BD4;color:#b0c8e0}
+    .insight strong{color:#7ab8f5}
+    .sub{color:#888}
+  }
+</style>
+</head>
+<body>
+
+<h2>UK Retail Dissolution — Model Comparison & Scenario Forecast</h2>
+<div class="sub">ARIMAX(2,1,1) + Holt ensemble · Backtested on rolling 12-month windows · 666,462 dissolved companies · Jan 2015–Jan 2026</div>
+
+<div class="insight">
+  <strong>Key methodological finding:</strong> Rolling backtests show Holt linear smoothing (OOS RMSE = 2,952) outperforms ARIMAX out-of-sample despite ARIMAX having better in-sample fit (RMSE = 1,998). This is the classic <em>bias-variance tradeoff</em> documented in Makridakis' M-competitions — simpler models generalise better on volatile short series. The final forecast uses a <strong>weighted ensemble (52% Holt + 48% ARIMAX)</strong>, which minimises expected OOS error.
+</div>
+
+<table class="model-table">
+  <tr><th>Model</th><th>Parameters</th><th>In-sample RMSE</th><th>OOS RMSE (rolling)</th><th>OOS MAE</th><th>Use in paper</th></tr>
+  <tr class="best-oos"><td>Holt linear smoothing</td><td>2</td><td>~2,952</td><td><strong>2,952</strong></td><td>2,177</td><td><span class="badge badge-amber">Forecast baseline</span></td></tr>
+  <tr><td>AR(2) no exogenous</td><td>4</td><td>~3,111</td><td>3,111</td><td>2,401</td><td><span class="badge badge-blue">Ablation check</span></td></tr>
+  <tr><td>ARIMAX(1,1,0) + online + seasonal</td><td>14</td><td>~3,222</td><td>3,222</td><td>2,497</td><td><span class="badge badge-blue">Ablation check</span></td></tr>
+  <tr><td>ARIMAX(2,1,1) + online + seasonal</td><td>16</td><td><strong>1,998</strong></td><td>3,133</td><td>2,430</td><td><span class="badge badge-blue">Causal analysis</span></td></tr>
+  <tr class="winner"><td>Ensemble (52% Holt + 48% ARIMAX)</td><td>—</td><td>—</td><td>~2,800 est.</td><td>—</td><td><span class="badge badge-green">Final forecast</span></td></tr>
+</table>
+
+<div class="grid2">
+  <div class="card">
+    <div class="label">Ensemble BAU cumulative 2026–2030</div>
+    <div class="val" style="color:#C04020">547,167</div>
+    <div class="note">business as usual — 10,737/month at 12m</div>
+  </div>
+  <div class="card">
+    <div class="label">Businesses saved by intervention</div>
+    <div class="val" style="color:#3B6D11">~106,400</div>
+    <div class="note">FM1+FM2+FM3 platform by Jan 2030</div>
+  </div>
+</div>
+
+<div class="btn-group">
+  <button class="active" id="btnEns" onclick="setView('ensemble')">Ensemble (recommended)</button>
+  <button id="btnComp" onclick="setView('compare')">All models compared</button>
+  <button id="btnCum" onclick="setView('cumulative')">Cumulative impact</button>
+</div>
+
+<div class="chart-wrap"><canvas id="mainChart"></canvas></div>
+<div class="legend" id="legendDiv"></div>
+
+<div class="insight" style="margin-top:8px">
+  <strong>Why not Prophet or LSTM?</strong> Prophet is optimised for daily business data with strong weekly seasonality — it overfits the small seasonal component in monthly retail data (STL: 3.5%) and underestimates structural level shifts. LSTM requires far more observations (n ≥ 500+) and becomes a black box incompatible with causal inference. ARIMAX is the natural complement to the Granger/cointegration framework already in the paper: it uses the same structural relationship (online share → dissolution) and produces interpretable coefficients.
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const textCol = isDark ? '#9c9a92' : '#5f5e5a';
+const gridCol = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+
+// Historical
+const histL = ["Aug 23","Sep 23","Oct 23","Nov 23","Dec 23","Jan 24","Feb 24","Mar 24","Apr 24","May 24","Jun 24","Jul 24","Aug 24","Sep 24","Oct 24","Nov 24","Dec 24","Jan 25","Feb 25","Mar 25","Apr 25","May 25","Jun 25","Jul 25","Aug 25","Sep 25","Oct 25","Nov 25","Dec 25","Jan 26"];
+const histV = [10497,8753,9632,9228,9231,11279,9395,9956,11329,9313,9390,11955,9880,11133,13483,10202,14910,4977,5000,8007,14460,11480,10879,13330,11352,13870,10287,10772,11914,10781];
+
+const fcL = ["Feb 26","Mar 26","Apr 26","May 26","Jun 26","Jul 26","Aug 26","Sep 26","Oct 26","Nov 26","Dec 26","Jan 27","Feb 27","Mar 27","Apr 27","May 27","Jun 27","Jul 27","Aug 27","Sep 27","Oct 27","Nov 27","Dec 27","Jan 28","Feb 28","Mar 28","Apr 28","May 28","Jun 28","Jul 28","Aug 28","Sep 28","Oct 28","Nov 28","Dec 28","Jan 29","Feb 29","Mar 29","Apr 29","May 29","Jun 29","Jul 29","Aug 29","Sep 29","Oct 29","Nov 29","Dec 29","Jan 30"];
+
+// Ensemble
+const ensB = [10003,10030,10057,10102,10107,10149,10169,10203,10196,10222,10228,10737,10278,10305,10316,10344,10348,11282,10406,10432,10436,10457,10461,11819,10518,10543,10547,10562,10565,12357,10621,10644,10648,10660,10662,12896,10716,10737,10741,10750,10752,13434,10805,10826,10830,10837,10839,12372];
+const ensI = [8286,8304,8322,8350,8356,8388,8403,8429,8424,8444,8449,8878,8504,8523,8531,8553,8557,9361,8614,8634,8638,8655,8659,9805,8711,8730,8734,8746,8748,10248,8800,8818,8821,8831,8833,10699,8884,8900,8904,8911,8913,11149,8966,8983,8986,8992,8994,10248];
+const ensLoB = [5703,5218,4827,4473,4148,3848,3566,3302,3053,2818,2597,2004,2186,1985,1793,1609,1432,891,1095,930,772,621,478,0,209,71,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const ensHiB = [14303,14842,15287,15731,16066,16450,16772,17104,17339,17626,17859,19470,18370,18625,18839,19079,19264,21673,19717,19934,20100,20293,20444,23638,20827,21015,21094,21222,21330,24714,21894,22022,22047,22108,22176,25792,22875,22976,23001,23021,23041,26868,23952,24052,24074,24082,24094,27644];
+const ensLoI = [4712,4316,4005,3733,3484,3260,3052,2856,2673,2502,2344,1658,2044,1877,1720,1570,1430,746,1119,978,844,718,601,0,384,258,140,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const ensHiI = [11860,12292,12639,12967,13228,13516,13754,14002,14175,14386,14554,16098,15168,15369,15542,15736,15884,17976,16334,16516,16661,16822,16957,19610,17314,17480,17548,17664,17758,20496,18151,18260,18278,18328,18384,21398,18960,19044,19062,19074,19086,22298,19822,19906,19920,19924,19932,23062];
+
+// Holt only
+const holtB = [9427,9427,9427,9455,9455,9482,9482,9510,9510,9537,9537,9593,9593,9621,9621,9648,9648,9705,9705,9732,9732,9760,9760,9816,9816,9844,9844,9871,9871,9928,9928,9955,9955,9983,9983,10040,10040,10067,10067,10095,10095,10152,10152,10179,10179,10207,10207,10263];
+const arimB = [10562,10559,10556,10580,10576,11923,10620,10655,10630,10657,10655,12026,10712,10742,10745,10773,10773,12829,10829,10857,10858,10880,10881,12933,10937,10963,10965,10983,10982,13736,11036,11059,11061,11075,11074,13840,11125,11145,11146,11157,11155,14643,14213,14232,14233,14241,14239,14747];
+const holtI = [7984,7963,7943,7922,7854,7833,7813,7792,7724,7703,7683,7684,7664,7643,7623,7602,7544,7523,7503,7482,7414,7394,7373,7404,7384,7363,7343,7282,7261,7241,7221,7200,7123,7102,7082,7123,7082,7061,7041,7020,6962,6942,6921,6901,6843,6882,6862,6843];
+const arimI = [8978,8975,8973,8993,8990,10135,9027,9056,9036,9058,9057,10223,9106,9131,9133,9157,9157,10906,10923,10946,10947,10966,10967,10995,11047,11070,11071,11087,11086,11767,11159,11178,11179,11192,11191,11838,11254,11273,11274,11284,11283,12450,12081,12097,12098,12105,12103,12540];
+
+function cumSum(a){let s=0;return a.map(v=>(s+=v));}
+const ensCumB=cumSum(ensB), ensCumI=cumSum(ensI), saved=ensCumB.map((v,i)=>v-ensCumI[i]);
+
+const RED=isDark?'#E85D24':'#C04020', BLUE=isDark?'#3B8BD4':'#185FA5';
+const GREY=isDark?'#888780':'#73726c', PURP=isDark?'#9F77DD':'#7F77DD';
+const GRN=isDark?'#97C459':'#639922';
+const fmtK = v => v>=1000?(v/1000).toFixed(0)+'k':Math.round(v);
+
+let chart=null;
+function mkChart(labels,datasets,yLabel){
+  if(chart)chart.destroy();
+  chart=new Chart(document.getElementById('mainChart'),{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:textCol,font:{size:9},maxRotation:45,autoSkip:true,maxTicksLimit:14},grid:{color:gridCol,drawBorder:false}},
+        y:{ticks:{color:textCol,font:{size:9},callback:fmtK},grid:{color:gridCol},
+           title:{display:true,text:yLabel,color:textCol,font:{size:10}}}
+      }}
+  });
+}
+function legend(items){
+  document.getElementById('legendDiv').innerHTML=items.map(({col,dash,label})=>
+    `<span><svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="${col}" stroke-width="2.5" ${dash?'stroke-dasharray="5 3"':''}/></svg>${label}</span>`).join('');
+}
+
+function setView(v){
+  document.querySelectorAll('.btn-group button').forEach(b=>b.classList.remove('active'));
+  document.getElementById({ensemble:'btnEns',compare:'btnComp',cumulative:'btnCum'}[v]).classList.add('active');
+
+  const allL = [...histL.slice(0,-1),...fcL];
+  const hPad = arr => [...arr.slice(0,-1),arr[arr.length-1],...new Array(fcL.length-1).fill(null)];
+  const fPad = arr => [...new Array(histL.length-1).fill(null),histV[histV.length-1],...arr];
+
+  if(v==='ensemble'){
+    mkChart(allL,[
+      {label:'Historical',data:hPad(histV),borderColor:GREY,borderWidth:1.5,pointRadius:0,tension:0.3,fill:false},
+      {label:'Ensemble BAU',data:fPad(ensB),borderColor:RED,borderWidth:2.5,pointRadius:0,tension:0.3,fill:false},
+      {label:'Ens BAU hi',data:fPad(ensHiB),borderColor:'transparent',backgroundColor:isDark?'rgba(232,93,36,0.12)':'rgba(192,64,32,0.08)',fill:'+1',pointRadius:0,tension:0.3},
+      {label:'Ens BAU lo',data:fPad(ensLoB),borderColor:'transparent',fill:false,pointRadius:0,tension:0.3},
+      {label:'Ensemble Intervention',data:fPad(ensI),borderColor:BLUE,borderWidth:2.5,borderDash:[6,3],pointRadius:0,tension:0.3,fill:false},
+      {label:'Ens Int hi',data:fPad(ensHiI),borderColor:'transparent',backgroundColor:isDark?'rgba(59,139,212,0.10)':'rgba(24,95,165,0.07)',fill:'+1',pointRadius:0,tension:0.3},
+      {label:'Ens Int lo',data:fPad(ensLoI),borderColor:'transparent',fill:false,pointRadius:0,tension:0.3},
+    ],'Monthly retail dissolutions');
+    legend([{col:GREY,dash:false,label:'Historical'},{col:RED,dash:false,label:'Ensemble BAU + 95% PI'},{col:BLUE,dash:true,label:'Ensemble intervention (FM1+FM2+FM3) + 95% PI'}]);
+  }
+
+  if(v==='compare'){
+    mkChart(allL,[
+      {label:'Historical',data:hPad(histV),borderColor:GREY,borderWidth:2,pointRadius:0,tension:0.3,fill:false},
+      {label:'Holt BAU',data:fPad(holtB),borderColor:isDark?'#EF9F27':'#854F0B',borderWidth:1.5,borderDash:[3,2],pointRadius:0,tension:0.3,fill:false},
+      {label:'ARIMAX BAU',data:fPad(arimB),borderColor:PURP,borderWidth:1.5,borderDash:[5,3],pointRadius:0,tension:0.3,fill:false},
+      {label:'Ensemble BAU',data:fPad(ensB),borderColor:RED,borderWidth:2.5,pointRadius:0,tension:0.3,fill:false},
+      {label:'Ensemble Intervention',data:fPad(ensI),borderColor:BLUE,borderWidth:2,borderDash:[6,3],pointRadius:0,tension:0.3,fill:false},
+    ],'Monthly retail dissolutions');
+    legend([
+      {col:GREY,dash:false,label:'Historical'},
+      {col:isDark?'#EF9F27':'#854F0B',dash:true,label:'Holt BAU (OOS winner)'},
+      {col:PURP,dash:true,label:'ARIMAX(2,1,1) BAU'},
+      {col:RED,dash:false,label:'Ensemble BAU (recommended)'},
+      {col:BLUE,dash:true,label:'Ensemble intervention'},
+    ]);
+  }
+
+  if(v==='cumulative'){
+    mkChart(fcL,[
+      {label:'BAU cumulative',data:ensCumB,borderColor:RED,borderWidth:2,pointRadius:0,tension:0.3,fill:false},
+      {label:'Intervention cumulative',data:ensCumI,borderColor:BLUE,borderWidth:2,borderDash:[6,3],pointRadius:0,tension:0.3,fill:false},
+      {label:'Businesses saved',data:saved,borderColor:'transparent',backgroundColor:isDark?'rgba(99,153,34,0.18)':'rgba(59,109,17,0.12)',fill:true,pointRadius:0,tension:0.3},
+    ],'Cumulative dissolutions (Feb 2026 baseline)');
+    legend([
+      {col:RED,dash:false,label:`BAU cumulative (547,167 by Jan 2030)`},
+      {col:BLUE,dash:true,label:`Intervention cumulative (440,737)`},
+      {col:isDark?'rgba(99,153,34,0.6)':'rgba(59,109,17,0.5)',dash:false,label:`Businesses saved (~106,400 by 2030)`},
+    ]);
+  }
+}
+setView('ensemble');
+</script>
+</body></html>

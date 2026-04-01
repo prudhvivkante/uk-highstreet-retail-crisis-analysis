@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>UK Retail Crisis — Full Dashboard</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;max-width:960px;margin:0 auto;padding:20px;background:#fff;color:#222}
+h3{font-size:14px;font-weight:600;margin:0 0 4px}
+.sub{font-size:11px;color:#666;margin-bottom:14px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+button{font-size:12px;padding:5px 14px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer}
+button.active{background:#222;color:#fff;border-color:#222}
+.chart-wrap{position:relative;width:100%;height:380px;margin-bottom:8px}
+.chart-sm{position:relative;width:100%;height:300px;margin-bottom:8px}
+.legend{display:flex;gap:12px;font-size:11px;color:#666;flex-wrap:wrap;margin-bottom:14px}
+.legend span{display:flex;align-items:center;gap:5px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.m{background:#f5f5f3;border-radius:8px;padding:12px}
+.m .lbl{font-size:10px;color:#777;margin-bottom:2px}
+.m .val{font-size:18px;font-weight:600}
+.m .note{font-size:10px;color:#999;margin-top:2px}
+.insight{border-left:3px solid #185FA5;padding:8px 12px;background:#f0f6fb;border-radius:0 6px 6px 0;font-size:11px;color:#333;line-height:1.6;margin-bottom:14px}
+@media(prefers-color-scheme:dark){
+  body{background:#1a1a18;color:#c2c0b6}
+  .m{background:#2a2a28}.m .lbl,.m .note{color:#888}
+  button{background:#2a2a28;border-color:#444;color:#c2c0b6}button.active{background:#c2c0b6;color:#1a1a18;border-color:#c2c0b6}
+  .insight{background:#0d1f30;border-color:#3B8BD4;color:#b0c8e0}.sub{color:#888}
+}
+</style>
+</head>
+<body>
+
+<div class="metrics">
+  <div class="m"><div class="lbl">Total dissolved 2015–2026</div><div class="val">666,462</div><div class="note">retail enterprises</div></div>
+  <div class="m"><div class="lbl">Excess since COVID</div><div class="val" style="color:#C04020">~215,800</div><div class="note">above counterfactual trend</div></div>
+  <div class="m"><div class="lbl">Jan 2026 vs pre-COVID avg</div><div class="val">5.9×</div><div class="note">monthly dissolution rate</div></div>
+  <div class="m"><div class="lbl">Businesses saved (policy)</div><div class="val" style="color:#3B6D11">~106,400</div><div class="note">by Jan 2030 with FM1–FM3</div></div>
+</div>
+
+<div class="tabs">
+  <button class="active" onclick="show('forecast')">Full history + forecast</button>
+  <button onclick="show('survival')">Survival analysis (KM curves)</button>
+  <button onclick="show('cumulative')">Cumulative impact</button>
+</div>
+
+<!-- FORECAST CHART -->
+<div id="pForecast">
+  <div class="chart-wrap"><canvas id="fcChart"></canvas></div>
+  <div class="legend" id="fcLegend"></div>
+  <div class="insight">
+    <strong>Four structural regimes visible:</strong> Pre-shock (Jan 2015–Feb 2020, avg 1,954/month) → Shock+moratorium (Mar 2020–Jun 2021, government halted dissolutions) → Rebound tsunami (Jul 2021–Dec 2022, pent-up closures released, 338% of pre-COVID rate) → New normal (2023–present, avg 9,917/month and still rising). Dashed grey = pre-COVID counterfactual trend; shaded gap = ~215,800 excess dissolutions.
+  </div>
+</div>
+
+<!-- SURVIVAL CHART -->
+<div id="pSurvival" style="display:none">
+  <div class="chart-sm"><canvas id="kmChart"></canvas></div>
+  <div class="legend" id="kmLegend"></div>
+  <div class="insight">
+    <strong>Survival is collapsing by cohort.</strong> A retail company incorporated in 2010–2012 had a 76% chance of surviving 5 years. By 2016–2018 that had fallen to 4%. The 2019 cohort shows an anomalous uptick — the COVID moratorium prevented dissolutions, artificially inflating apparent survival. Note: curves truncate where the cohort has not yet reached that age; the 2019 and 2020–2021 curves drop steeply because those companies are only now reaching dissolution age in the post-moratorium surge.
+  </div>
+</div>
+
+<!-- CUMULATIVE CHART -->
+<div id="pCumulative" style="display:none">
+  <div class="chart-sm"><canvas id="cumChart"></canvas></div>
+  <div class="legend" id="cumLegend"></div>
+  <div class="insight">
+    <strong>~106,400 businesses saved by 2030</strong> if the FM1+FM2+FM3 platform is deployed now. BAU: 547,167 cumulative dissolutions (Feb 2026–Jan 2030). Intervention: 440,737. The gap widens fastest in 2026–2027 when the intervention effect on online share begins compounding through the structural equation.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const tc = isDark?'#9c9a92':'#5f5e5a', gc = isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
+const RED=isDark?'#E85D24':'#C04020', BLUE=isDark?'#3B8BD4':'#185FA5';
+const GREY=isDark?'#888780':'#73726c', GRN=isDark?'#97C459':'#3B6D11';
+const PURP=isDark?'#AFA9EC':'#7F77DD', TEAL=isDark?'#5DCAA5':'#0F6E56';
+const AMBER=isDark?'#EF9F27':'#854F0B', CORAL=isDark?'#F0997B':'#993C1D';
+
+// ── ALL 133 MONTHS HISTORICAL ─────────────────────────────────────────────────
+const histData = [
+  ["Jan 15",1004,12.8],["Feb 15",1304,11.7],["Mar 15",1370,11.7],["Apr 15",835,12.2],["May 15",1330,11.7],["Jun 15",1338,11.9],
+  ["Jul 15",1129,11.8],["Aug 15",1394,11.5],["Sep 15",1558,12.1],["Oct 15",1149,12.7],["Nov 15",1338,15.5],["Dec 15",1303,14.1],
+  ["Jan 16",2143,14.2],["Feb 16",1561,12.9],["Mar 16",2054,13.0],["Apr 16",995,13.5],["May 16",956,13.6],["Jun 16",1505,13.9],
+  ["Jul 16",1525,13.4],["Aug 16",1723,13.7],["Sep 16",408,14.8],["Oct 16",909,15.5],["Nov 16",820,18.8],["Dec 16",1633,17.1],
+  ["Jan 17",1706,16.2],["Feb 17",1342,15.2],["Mar 17",1396,15.6],["Apr 17",521,15.2],["May 17",1900,15.4],["Jun 17",647,15.8],
+  ["Jul 17",1572,15.5],["Aug 17",2039,15.4],["Sep 17",1769,16.0],["Oct 17",694,16.5],["Nov 17",1455,19.9],["Dec 17",629,17.9],
+  ["Jan 18",3608,17.7],["Feb 18",2568,16.8],["Mar 18",2173,17.3],["Apr 18",2660,17.2],["May 18",579,17.5],["Jun 18",2746,17.5],
+  ["Jul 18",2552,17.1],["Aug 18",2832,16.7],["Sep 18",2750,17.2],["Oct 18",3166,18.1],["Nov 18",1012,21.6],["Dec 18",1820,19.7],
+  ["Jan 19",3699,19.3],["Feb 19",2509,18.3],["Mar 19",2389,18.9],["Apr 19",4809,18.4],["May 19",3321,18.8],["Jun 19",933,18.3],
+  ["Jul 19",3715,18.7],["Aug 19",1558,18.1],["Sep 19",3525,18.1],["Oct 19",4181,19.1],["Nov 19",3483,21.6],["Dec 19",2924,21.4],
+  ["Jan 20",4080,20.2],["Feb 20",4574,19.1],["Mar 20",4447,22.1],["Apr 20",972,30.3],["May 20",87,32.8],["Jun 20",71,31.3],
+  ["Jul 20",111,28.3],["Aug 20",126,27.0],["Sep 20",6248,26.7],["Oct 20",8773,29.0],["Nov 20",4482,37.2],["Dec 20",2371,31.3],
+  ["Jan 21",7532,37.8],["Feb 21",167,36.5],["Mar 21",9340,34.4],["Apr 21",3459,30.1],["May 21",2979,28.5],["Jun 21",5022,27.9],
+  ["Jul 21",5231,28.0],["Aug 21",4271,27.7],["Sep 21",7698,28.3],["Oct 21",5860,28.9],["Nov 21",7797,32.8],["Dec 21",5359,30.5],
+  ["Jan 22",6794,30.1],["Feb 22",7032,27.9],["Mar 22",7378,26.3],["Apr 22",6716,26.5],["May 22",7138,25.7],["Jun 22",7897,25.2],
+  ["Jul 22",7290,24.9],["Aug 22",8838,24.4],["Sep 22",7264,25.2],["Oct 22",8558,25.9],["Nov 22",1978,29.9],["Dec 22",9113,27.1],
+  ["Jan 23",1174,27.3],["Feb 23",5397,25.8],["Mar 23",7008,26.1],["Apr 23",8073,25.8],["May 23",9323,25.7],["Jun 23",11020,25.4],
+  ["Jul 23",8273,26.3],["Aug 23",10497,25.3],["Sep 23",8753,25.9],["Oct 23",9632,26.7],["Nov 23",9228,31.3],["Dec 23",9231,28.1],
+  ["Jan 24",11279,27.3],["Feb 24",9395,25.9],["Mar 24",9956,25.8],["Apr 24",11329,26.3],["May 24",9313,26.6],["Jun 24",9390,26.2],
+  ["Jul 24",11955,26.9],["Aug 24",9880,25.5],["Sep 24",11133,27.0],["Oct 24",13483,27.7],["Nov 24",10202,30.3],["Dec 24",14910,29.0],
+  ["Jan 25",4977,26.8],["Feb 25",5000,25.9],["Mar 25",8007,26.6],["Apr 25",14460,26.2],["May 25",11480,26.1],["Jun 25",10879,26.5],
+  ["Jul 25",13330,26.6],["Aug 25",11352,26.0],["Sep 25",13870,27.2],["Oct 25",10287,27.9],["Nov 25",10772,32.3],["Dec 25",11914,29.4],
+  ["Jan 26",10781,28.9]
+];
+
+const histL = histData.map(d=>d[0]);
+const histV = histData.map(d=>d[1]);
+const onlineV = histData.map(d=>d[2]);
+
+// Pre-COVID counterfactual (linear fit on first 62 months)
+const n62=62; let sx=0,sy=0,sxy=0,sxx=0;
+for(let i=0;i<n62;i++){sx+=i;sy+=histV[i];sxy+=i*histV[i];sxx+=i*i;}
+const slope=(n62*sxy-sx*sy)/(n62*sxx-sx*sx), intc=(sy-slope*sx)/n62;
+const cfAll = histData.map((_,i)=>Math.round(slope*i+intc));
+
+// Forecast labels + data (ensemble)
+const fcL=["Feb 26","Mar 26","Apr 26","May 26","Jun 26","Jul 26","Aug 26","Sep 26","Oct 26","Nov 26","Dec 26","Jan 27","Feb 27","Mar 27","Apr 27","May 27","Jun 27","Jul 27","Aug 27","Sep 27","Oct 27","Nov 27","Dec 27","Jan 28","Feb 28","Mar 28","Apr 28","May 28","Jun 28","Jul 28","Aug 28","Sep 28","Oct 28","Nov 28","Dec 28","Jan 29","Feb 29","Mar 29","Apr 29","May 29","Jun 29","Jul 29","Aug 29","Sep 29","Oct 29","Nov 29","Dec 29","Jan 30"];
+const bauV=[10003,10030,10057,10102,10107,10149,10169,10203,10196,10222,10228,10737,10278,10305,10316,10344,10348,11282,10406,10432,10436,10457,10461,11819,10518,10543,10547,10562,10565,12357,10621,10644,10648,10660,10662,12896,10716,10737,10741,10750,10752,13434,10805,10826,10830,10837,10839,12372];
+const intV=[8286,8304,8322,8350,8356,8388,8403,8429,8424,8444,8449,8878,8504,8523,8531,8553,8557,9361,8614,8634,8638,8655,8659,9805,8711,8730,8734,8746,8748,10248,8800,8818,8821,8831,8833,10699,8884,8900,8904,8911,8913,11149,8966,8983,8986,8992,8994,10248];
+const bauHi=[13727,14278,14703,15126,15453,15804,16078,16389,16629,16910,17127,17442,17636,17878,18057,18284,18511,18726,18883,19090,19238,19439,19520,19816,19816,20001,20001,20078,20078,20383,20383,20421,20421,20504,20504,20820,20820,20797,20797,20820,20820,20930,20930,20944,20944,20970,20970,21070];
+const bauLo=[5128,4576,4150,3784,3457,3160,2886,2631,2391,2164,1948,1745,1551,1365,1186,1013,846,684,527,375,226,81,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const intHi=[12284,12793,13180,13504,13696,13950,14183,14397,14502,14686,14862,14958,15112,15256,15246,15447,15389,15502,15609,15719,15652,15773,15787,15901,15901,16001,15994,15931,16001,16083,16013,16095,16004,16087,16001,16140,16086,16079,16035,16107,16001,16083,16001,16087,16001,16079,16001,16083];
+const intLo=[3684,3133,2706,2340,2013,1716,1443,1187,946,720,504,410,216,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+// Regime background plugin
+const regimePlugin={
+  id:'regimes',
+  beforeDatasetsDraw(chart){
+    const {ctx,chartArea:{left,right,top,bottom},scales:{x}}=chart;
+    // Only for the main forecast chart
+    if(!chart.canvas.id==='fcChart') return;
+    const regimes=[
+      {from:0,to:61,col:'rgba(59,139,213,0.06)'},
+      {from:62,to:77,col:'rgba(232,89,60,0.09)'},
+      {from:78,to:95,col:'rgba(239,159,39,0.09)'},
+      {from:96,to:132,col:'rgba(99,153,34,0.07)'},
+    ];
+    regimes.forEach(r=>{
+      const x1=x.getPixelForValue(r.from),x2=x.getPixelForValue(Math.min(r.to,histL.length-1));
+      ctx.fillStyle=r.col; ctx.fillRect(x1,top,x2-x1,bottom-top);
+    });
+  }
+};
+
+// Combined labels: all 133 hist + 48 forecast
+const allL=[...histL,...fcL];
+const N=histL.length;
+// Pad historical to full length, null for forecast
+const hPad=[...histV,...new Array(fcL.length).fill(null)];
+const cfPad=[...cfAll,...new Array(fcL.length).fill(null)];
+const onPad=[...onlineV,...new Array(fcL.length).fill(null)];
+// Pad forecast: null for historical, connect at Jan 26
+const fPad=arr=>[...new Array(N-1).fill(null),histV[N-1],...arr];
+const fPadNull=arr=>[...new Array(N-1).fill(null),null,...arr];
+
+function mkLegend(id,items){
+  document.getElementById(id).innerHTML=items.map(({col,dash,label})=>
+    `<span><svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="${col}" stroke-width="2.5" ${dash?'stroke-dasharray="5 3"':''}/></svg>${label}</span>`).join('');
+}
+
+let charts={};
+function mkChart(id,labels,datasets,yLabel,y2Label,plugins){
+  if(charts[id]) charts[id].destroy();
+  const scales={
+    x:{ticks:{color:tc,font:{size:9},maxRotation:45,autoSkip:true,maxTicksLimit:18},grid:{color:gc,drawBorder:false}},
+    y:{ticks:{color:tc,font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v},grid:{color:gc},
+       title:{display:!!yLabel,text:yLabel||'',color:tc,font:{size:10}}}
+  };
+  if(y2Label) scales.y2={position:'right',ticks:{color:BLUE,font:{size:9},callback:v=>v+'%'},
+    grid:{display:false},title:{display:true,text:y2Label,color:BLUE,font:{size:10}},min:0,max:45};
+  charts[id]=new Chart(document.getElementById(id),{
+    type:'line',data:{labels,datasets},
+    plugins:plugins||[],
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false}},scales}
+  });
+}
+
+function buildForecast(){
+  mkChart('fcChart',allL,[
+    {label:'Actual',data:hPad,borderColor:GREY,borderWidth:1.5,pointRadius:0,tension:0.3,fill:false},
+    {label:'Counterfactual',data:cfPad,borderColor:isDark?'#444':'#bbb',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false},
+    {label:'Online share %',data:onPad,borderColor:BLUE,borderWidth:1.5,pointRadius:0,tension:0.3,fill:false,yAxisID:'y2'},
+    {label:'BAU forecast',data:fPad(bauV),borderColor:RED,borderWidth:2.5,pointRadius:0,tension:0.3,fill:false},
+    {label:'BAU hi',data:fPadNull(bauHi),borderColor:'transparent',backgroundColor:isDark?'rgba(232,93,36,0.11)':'rgba(192,64,32,0.08)',fill:'+1',pointRadius:0,tension:0.3},
+    {label:'BAU lo',data:fPadNull(bauLo),borderColor:'transparent',fill:false,pointRadius:0,tension:0.3},
+    {label:'Intervention',data:fPad(intV),borderColor:GRN,borderWidth:2,borderDash:[6,3],pointRadius:0,tension:0.3,fill:false},
+    {label:'Int hi',data:fPadNull(intHi),borderColor:'transparent',backgroundColor:isDark?'rgba(59,109,17,0.10)':'rgba(59,109,17,0.07)',fill:'+1',pointRadius:0,tension:0.3},
+    {label:'Int lo',data:fPadNull(intLo),borderColor:'transparent',fill:false,pointRadius:0,tension:0.3},
+  ],'Monthly dissolutions','Online share %',[regimePlugin]);
+  mkLegend('fcLegend',[
+    {col:GREY,dash:false,label:'Actual dissolutions (Jan 2015–Jan 2026)'},
+    {col:isDark?'#666':'#bbb',dash:true,label:'Pre-COVID counterfactual trend'},
+    {col:BLUE,dash:false,label:'Online share % (right axis)'},
+    {col:RED,dash:false,label:'BAU forecast + 95% PI'},
+    {col:GRN,dash:true,label:'Intervention (FM1+FM2+FM3) + 95% PI'},
+  ]);
+}
+
+// ── KAPLAN-MEIER DATA ─────────────────────────────────────────────────────────
+const kmMonths=[0,6,12,18,24,30,36,42,48,54,60,66,72,78,84];
+const kmCohorts={
+  '2010–2012':[100.0,100.0,100.0,99.8,99.0,97.3,95.6,93.6,90.2,83.7,75.7,63.7,57.0,43.3,34.0],
+  '2013–2015':[100.0,100.0,99.9,98.3,92.6,72.5,66.1,45.4,35.5,21.8,16.6,9.5,5.7,3.3,2.9],
+  '2016–2018':[100.0,97.1,89.9,42.7,32.5,14.3,9.5,5.7,4.8,4.1,3.6,2.8,2.3,1.6,1.1],
+  '2019':     [100.0,89.9,86.4,81.0,64.3,56.2,53.1,50.1,47.9,45.4,44.0,31.9,0.6,null,null],
+  '2020–2021':[100.0,98.6,94.7,63.9,57.8,47.2,41.4,25.5,14.7,6.2,0.3,null,null,null,null],
+};
+const kmCols=[PURP,TEAL,AMBER,RED,CORAL];
+
+function buildKM(){
+  const datasets=Object.entries(kmCohorts).map(([name,vals],i)=>({
+    label:name, data:vals, borderColor:kmCols[i], borderWidth:2,
+    pointRadius:3, pointBackgroundColor:kmCols[i], tension:0.3, fill:false,
+    spanGaps:false
+  }));
+  mkChart('kmChart',kmMonths.map(m=>m+'m'),datasets,'Survival probability (%)');
+  mkLegend('kmLegend',Object.keys(kmCohorts).map((k,i)=>({col:kmCols[i],dash:false,label:`${k} cohort`})));
+}
+
+// ── CUMULATIVE ────────────────────────────────────────────────────────────────
+function cumSum(a){let s=0;return a.map(v=>s+=v);}
+const bauCum=cumSum(bauV), intCum=cumSum(intV), savedCum=bauCum.map((v,i)=>v-intCum[i]);
+
+function buildCum(){
+  mkChart('cumChart',fcL,[
+    {label:'BAU',data:bauCum,borderColor:RED,borderWidth:2,pointRadius:0,tension:0.3,fill:false},
+    {label:'Intervention',data:intCum,borderColor:GRN,borderWidth:2,borderDash:[6,3],pointRadius:0,tension:0.3,fill:false},
+    {label:'Saved',data:savedCum,borderColor:'transparent',
+      backgroundColor:isDark?'rgba(59,109,17,0.18)':'rgba(59,109,17,0.11)',fill:true,pointRadius:0,tension:0.3},
+  ],'Cumulative dissolutions from Feb 2026');
+  mkLegend('cumLegend',[
+    {col:RED,dash:false,label:'BAU cumulative (547,167 by Jan 2030)'},
+    {col:GRN,dash:true,label:'Intervention cumulative (440,737)'},
+    {col:isDark?'rgba(59,109,17,0.5)':'rgba(59,109,17,0.4)',dash:false,label:'~106,400 businesses saved by Jan 2030'},
+  ]);
+}
+
+function show(tab){
+  ['Forecast','Survival','Cumulative'].forEach(t=>{
+    document.getElementById('p'+t).style.display='none';
+  });
+  document.getElementById('p'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='block';
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(tab==='forecast' && !charts.fcChart) buildForecast();
+  if(tab==='survival' && !charts.kmChart) buildKM();
+  if(tab==='cumulative' && !charts.cumChart) buildCum();
+}
+
+// Build on load
+buildForecast();
+</script>
+</body></html>

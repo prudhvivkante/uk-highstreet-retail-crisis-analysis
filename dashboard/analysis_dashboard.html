@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Why Your High Street Is Emptying — Kante (2026)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--navy:#1F4E79;--blue:#2E75B6;--amber:#B7770D;--red:#C04020;--green:#1E8449;--grey:#6B7280;--ltblue:#BDD7EE;--vltblue:#DBEAF7;--warn:#FDF3DC;--bg:#F8FAFC;--card:#fff;--border:#E2E8F0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1e293b;font-size:14px}
+header{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:24px 36px}
+header h1{font-size:1.5rem;font-weight:700}
+header p{margin-top:4px;opacity:.82;font-size:.88rem}
+header .meta{margin-top:8px;display:flex;gap:20px;flex-wrap:wrap;font-size:.77rem;opacity:.72}
+nav{background:var(--navy);display:flex;gap:1px;padding:0 20px;overflow-x:auto}
+nav button{background:transparent;border:none;color:rgba(255,255,255,.7);padding:11px 16px;cursor:pointer;font-size:.83rem;font-weight:500;white-space:nowrap;border-bottom:3px solid transparent;transition:.15s}
+nav button:hover{color:#fff}
+nav button.active{color:#fff;border-bottom-color:var(--amber);background:rgba(255,255,255,.07)}
+.tab{display:none;padding:24px 28px;max-width:1380px;margin:0 auto}
+.tab.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:16px;border-top:4px solid var(--navy)}
+.kpi.red{border-top-color:var(--red)}.kpi.green{border-top-color:var(--green)}.kpi.amber{border-top-color:var(--amber)}.kpi.blue{border-top-color:var(--blue)}
+.kpi-val{font-size:1.6rem;font-weight:700;color:var(--navy);line-height:1}
+.kpi.red .kpi-val{color:var(--red)}.kpi.green .kpi-val{color:var(--green)}.kpi.amber .kpi-val{color:var(--amber)}.kpi.blue .kpi-val{color:var(--blue)}
+.kpi-label{font-size:.7rem;color:var(--grey);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.kpi-sub{font-size:.76rem;color:#475569;margin-top:5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:18px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:18px}
+.card h3{font-size:.92rem;color:var(--navy);font-weight:600;margin-bottom:12px;padding-bottom:7px;border-bottom:2px solid var(--vltblue)}
+.cw{position:relative;height:270px}.cw.tall{height:330px}.cw.xtall{height:390px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{background:var(--navy);color:#fff;padding:7px 9px;text-align:left;font-size:.76rem;font-weight:600}
+tbody tr:nth-child(even){background:var(--vltblue)}
+tbody td{padding:6px 9px;border-bottom:1px solid var(--border)}
+.bdg{display:inline-block;padding:2px 7px;border-radius:20px;font-size:.7rem;font-weight:600}
+.bdg-r{background:#fee2e2;color:#991b1b}.bdg-g{background:#dcfce7;color:#166534}
+.bdg-a{background:#fef3c7;color:#92400e}.bdg-b{background:var(--vltblue);color:var(--navy)}
+.box{background:var(--vltblue);border-left:4px solid var(--navy);border-radius:0 7px 7px 0;padding:12px 16px;margin:12px 0;font-size:.83rem}
+.box strong{color:var(--navy)}
+.boxa{background:var(--warn);border-left-color:var(--amber)}.boxa strong{color:var(--amber)}
+.st{font-size:1.05rem;font-weight:700;color:var(--navy);margin:22px 0 10px}
+footer{background:var(--navy);color:rgba(255,255,255,.65);text-align:center;padding:14px;font-size:.76rem;margin-top:36px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Why Your High Street Is Emptying</h1>
+  <p>A Rigorous Data Science Account of UK Retail Structural Collapse</p>
+  <div class="meta">
+    <span>&#128202; Venkata Prudhvi Kante (2026)</span>
+    <span>&#128197; Jan 2015 &#8211; Jan 2026</span>
+    <span>&#127968; 666,462 dissolution records</span>
+    <span>&#128200; 13 statistical methods &#183; 5 government datasets</span>
+  </div>
+</header>
+<nav>
+  <button class="active" onclick="showTab('ov',this)">Overview</button>
+  <button onclick="showTab('dis',this)">Dissolution</button>
+  <button onclick="showTab('dem',this)">Business Demography</button>
+  <button onclick="showTab('surv',this)">Survival Analysis</button>
+  <button onclick="showTab('geo',this)">Geographic</button>
+  <button onclick="showTab('reg',this)">Regression &amp; Causality</button>
+  <button onclick="showTab('fc',this)">Forecast</button>
+  <button onclick="showTab('st',this)">All Statistics</button>
+  <button onclick="showTab('meth',this)">Methodology</button>
+</nav>
+
+<div id="tab-ov" class="tab active">
+  <div class="kpi-row">
+    <div class="kpi red"><div class="kpi-val">666,462</div><div class="kpi-label">Total Dissolutions</div><div class="kpi-sub">Jan 2015 &#8211; Jan 2026</div></div>
+    <div class="kpi red"><div class="kpi-val">5.9&#215;</div><div class="kpi-label">Rate Acceleration</div><div class="kpi-sub">Jan 2026 vs pre-COVID avg</div></div>
+    <div class="kpi red"><div class="kpi-val">~215,800</div><div class="kpi-label">Excess Dissolutions</div><div class="kpi-sub">Above counterfactual trend</div></div>
+    <div class="kpi amber"><div class="kpi-val">28.9%</div><div class="kpi-label">Online Share Jan 2026</div><div class="kpi-sub">vs 12.8% in Jan 2015</div></div>
+    <div class="kpi red"><div class="kpi-val">20&#215;</div><div class="kpi-label">Survival Collapse</div><div class="kpi-sub">5-yr: 75.7% &#8594; 3.6%</div></div>
+    <div class="kpi green"><div class="kpi-val">~106,400</div><div class="kpi-label">Businesses Saved</div><div class="kpi-sub">FM1+FM2+FM3 by Jan 2030</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Monthly Dissolution Count &#8212; Full History</h3><div class="cw"><canvas id="c-ovd"></canvas></div></div>
+    <div class="card"><h3>Online Share vs Dissolution (Structural Relationship)</h3><div class="cw"><canvas id="c-ovs"></canvas></div></div>
+  </div>
+  <div class="box"><strong>Core finding:</strong> The UK retail sector has undergone a structural inversion. Before 2020 it generated +6,618 net new businesses/year (2016&#8211;2019). After 2022 this inverted to &#8722;1,648/year. January 2026 dissolution rate: <strong>10,781/month = 5.9&#215; pre-COVID average</strong>.</div>
+  <div class="boxa box"><strong>New finding &#8212; monthly panel:</strong> Granger causality at monthly frequency sharpens the causal lag from the previously estimated 24 months (annual aggregation artefact) to <strong>1&#8211;2 months</strong>. Online share &#8594; dissolution at lag 1: F=25.26, p&lt;0.001.</div>
+  <div class="st">Four Structural Regimes</div>
+  <table><thead><tr><th>Regime</th><th>Period</th><th>n</th><th>Avg dis/month</th><th>Avg online %</th><th>Character</th></tr></thead><tbody id="tReg"></tbody></table>
+</div>
+
+<div id="tab-dis" class="tab">
+  <div class="kpi-row">
+    <div class="kpi red"><div class="kpi-val">10,781</div><div class="kpi-label">Jan 2026 Rate</div><div class="kpi-sub">per month</div></div>
+    <div class="kpi"><div class="kpi-val">1,954</div><div class="kpi-label">Pre-COVID Avg</div><div class="kpi-sub">Jan 2015 &#8211; Feb 2020</div></div>
+    <div class="kpi red"><div class="kpi-val">~215,800</div><div class="kpi-label">Excess Dissolutions</div><div class="kpi-sub">Above pre-COVID trend</div></div>
+    <div class="kpi amber"><div class="kpi-val">20&#8211;25%</div><div class="kpi-label">Tipping Point</div><div class="kpi-sub">Online share threshold</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px"><h3>Monthly Dissolution with Pre-COVID Counterfactual</h3><div class="cw xtall"><canvas id="c-dis"></canvas></div>
+  <div class="box" style="margin-top:10px"><strong>Counterfactual gap:</strong> The grey dashed line shows where dissolution counts would be had pre-COVID trends continued. The gap represents ~215,800 excess dissolutions &#8212; businesses that would not have closed absent the structural shift in online penetration.</div></div>
+  <div class="grid2">
+    <div class="card"><h3>Annual Average Monthly Rate</h3><div class="cw"><canvas id="c-ann"></canvas></div></div>
+    <div class="card"><h3>Non-Linear Threshold: Online Share Bands</h3><div class="cw"><canvas id="c-thr"></canvas></div>
+    <div class="boxa box" style="margin-top:10px"><strong>Tipping point at 20&#8211;25%:</strong> Dissolution rates roughly quadruple across this band then stabilise at ~7&#215; baseline above 25%. Suggests winner-takes-most dynamics in digital consumer discovery.</div></div>
+  </div>
+</div>
+
+<div id="tab-dem" class="tab">
+  <div class="kpi-row">
+    <div class="kpi green"><div class="kpi-val">+6,618</div><div class="kpi-label">Pre-COVID Net/Year</div><div class="kpi-sub">2016&#8211;2019 average</div></div>
+    <div class="kpi red"><div class="kpi-val">&#8722;1,648</div><div class="kpi-label">Post-COVID Net/Year</div><div class="kpi-sub">2022&#8211;2024 average</div></div>
+    <div class="kpi red"><div class="kpi-val">&#8722;8,266</div><div class="kpi-label">Structural Change</div><div class="kpi-sub">enterprises per year</div></div>
+    <div class="kpi amber"><div class="kpi-val">52&#8211;53%</div><div class="kpi-label">Death Rate 2022&#8211;23</div><div class="kpi-sub">vs 41&#8211;45% pre-COVID</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px"><h3>ONS Business Demography SIC 47 &#8212; Births, Deaths &amp; Net Change 2016&#8211;2024</h3><div class="cw tall"><canvas id="c-biz"></canvas></div></div>
+  <div class="box"><strong>Structural inversion (2022):</strong> For every year 2016&#8211;2019 UK retail generated more businesses than it lost. In 2022 deaths exceeded births for the first time in the available series &#8212; not during the pandemic but afterwards, when support schemes ended and the online plateau had established itself.</div>
+  <table style="margin-top:14px"><thead><tr><th>Year</th><th>Births</th><th>Deaths</th><th>Net Change</th><th>Death Rate</th><th>Phase</th></tr></thead><tbody id="tBiz"></tbody></table>
+</div>
+
+<div id="tab-surv" class="tab">
+  <div class="kpi-row">
+    <div class="kpi green"><div class="kpi-val">75.7%</div><div class="kpi-label">5-yr Survival 2010&#8211;12</div><div class="kpi-sub">n = 2,306</div></div>
+    <div class="kpi red"><div class="kpi-val">3.6%</div><div class="kpi-label">5-yr Survival 2016&#8211;18</div><div class="kpi-sub">n = 7,707</div></div>
+    <div class="kpi red"><div class="kpi-val">20&#215;</div><div class="kpi-label">Survival Collapse</div><div class="kpi-sub">Across one decade</div></div>
+    <div class="kpi amber"><div class="kpi-val">22 months</div><div class="kpi-label">Median Age at Closure</div><div class="kpi-sub">43.1% close at 12&#8211;24m</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Kaplan-Meier Survival Curves by Incorporation Cohort</h3><div class="cw tall"><canvas id="c-km"></canvas></div>
+    <div class="box" style="margin-top:10px"><strong>20-fold collapse:</strong> 5-year survival fell from 75.7% (2010&#8211;12) to 3.6% (2016&#8211;18). Two-thirds of retail businesses incorporated in 2016&#8211;18 dissolved within two years. No precedent in UK retail demography literature.</div></div>
+    <div class="card"><h3>Age at Dissolution Distribution</h3><div class="cw tall"><canvas id="c-age"></canvas></div>
+    <div class="boxa box" style="margin-top:10px"><strong>Rapid failure:</strong> 43.1% of dissolved companies were aged 12&#8211;24 months at closure. Median age &#8776;22 months &#8212; firms fail before most can attempt digital adoption.</div></div>
+  </div>
+  <table><thead><tr><th>Cohort</th><th>n</th><th>12m</th><th>24m</th><th>36m</th><th>60m</th></tr></thead>
+  <tbody>
+    <tr><td>2010&#8211;2012</td><td>2,306</td><td>100.0%</td><td>99.0%</td><td>95.6%</td><td style="color:var(--green);font-weight:700">75.7%</td></tr>
+    <tr><td>2013&#8211;2015</td><td>4,454</td><td>99.9%</td><td>92.6%</td><td>66.1%</td><td>16.6%</td></tr>
+    <tr><td>2016&#8211;2018</td><td>7,707</td><td>89.9%</td><td>32.5%</td><td>9.5%</td><td style="color:var(--red);font-weight:700">3.6%</td></tr>
+    <tr><td>2019*</td><td>810</td><td>86.4%</td><td>64.3%</td><td>53.1%</td><td>44.0%*</td></tr>
+    <tr><td>2020&#8211;2021*</td><td>1,128</td><td>94.7%</td><td>57.8%</td><td>41.4%</td><td>0.3%*</td></tr>
+  </tbody></table>
+  <p style="font-size:.73rem;color:var(--grey);margin-top:5px">* Upward-biased: dissolution moratorium (Apr 2020&#8211;Jun 2021)</p>
+</div>
+
+<div id="tab-geo" class="tab">
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">21,037</div><div class="kpi-label">Clean Records</div><div class="kpi-sub">After CF14 8LH exclusion</div></div>
+    <div class="kpi red"><div class="kpi-val">1,892</div><div class="kpi-label">Artefacts Removed</div><div class="kpi-sub">CH default address CF14 8LH</div></div>
+    <div class="kpi blue"><div class="kpi-val">~27.6%</div><div class="kpi-label">London Combined</div><div class="kpi-sub">All London zones</div></div>
+    <div class="kpi"><div class="kpi-val">113</div><div class="kpi-label">Postcode Areas</div><div class="kpi-sub">UK-wide</div></div>
+  </div>
+  <div class="boxa box"><strong>Cardiff CF14 8LH artefact:</strong> Raw data showed Cardiff ranking 1st nationally with 1,928 records. Investigation: 98.1% (1,892) used the CH default administrative address &#8212; assigned to online-only retailers with no physical UK location (SIC 47910: 44% of default-address records). After exclusion: real Cardiff = 224 records, rank 28th nationally.</div>
+  <div class="grid2" style="margin-top:14px">
+    <div class="card"><h3>Top 20 Postcode Areas by Dissolution Count</h3><div class="cw xtall"><canvas id="c-geo"></canvas></div></div>
+    <div class="card"><h3>Regional Breakdown</h3><div class="cw"><canvas id="c-gpie"></canvas></div>
+    <div class="box" style="margin-top:10px"><strong>Three clusters:</strong> London (~27.6%), Midlands belt (Birmingham, Coventry, Dudley, Leicester &#8212; traditional physical retail most exposed to online displacement), Northern cities (Manchester, Sheffield, Leeds, Bradford).</div></div>
+  </div>
+  <table style="margin-top:14px"><thead><tr><th>Rank</th><th>Code</th><th>Area</th><th>Dissolutions</th><th>Region</th></tr></thead><tbody id="tGeo"></tbody></table>
+</div>
+
+<div id="tab-reg" class="tab">
+  <div class="kpi-row">
+    <div class="kpi blue"><div class="kpi-val">+599</div><div class="kpi-label">&#946;&#770; (dis/pp)</div><div class="kpi-sub">OLS HAC n=111</div></div>
+    <div class="kpi blue"><div class="kpi-val">0.711</div><div class="kpi-label">R&#178;</div><div class="kpi-sub">Non-pandemic monthly</div></div>
+    <div class="kpi green"><div class="kpi-val">t = 9.29</div><div class="kpi-label">t-statistic</div><div class="kpi-sub">p &lt; 0.001 ***</div></div>
+    <div class="kpi"><div class="kpi-val">[472, 725]</div><div class="kpi-label">95% CI</div><div class="kpi-sub">for &#946;&#770;</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Monthly OLS: Dissolution Count vs Online Share (Non-Pandemic, n=111)</h3><div class="cw tall"><canvas id="c-ols"></canvas></div></div>
+    <div class="card"><h3>Granger Causality F-Statistics at Lags 1&#8211;12</h3><div class="cw tall"><canvas id="c-gcf"></canvas></div>
+    <div class="boxa box" style="margin-top:10px"><strong>Causal lag = 1&#8211;2 months:</strong> Lag 1: F=25.26, p&lt;0.001. Lag 2: F=4.43, p=0.014. The 24-month annual estimate was a temporal aggregation artefact. Economic mechanism: online penetration affects consumer traffic within weeks; dissolution filings follow at the next CH administrative batch.</div></div>
+  </div>
+  <div class="st">OLS Model Specifications</div>
+  <table><thead><tr><th>Model</th><th>n</th><th>&#946;&#770; online</th><th>t</th><th>p</th><th>R&#178;</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Model 1: Full + pandemic dummy</td><td>133</td><td>+558</td><td>+7.63</td><td>&lt;0.001***</td><td>0.608</td><td>Pandemic dummy = &#8722;6,228</td></tr>
+    <tr><td>Model 2: Full + separate moratorium</td><td>133</td><td>+572</td><td>+8.11</td><td>&lt;0.001***</td><td>0.644</td><td>Moratorium dummy = &#8722;4,043</td></tr>
+    <tr><td><strong>Model 3: Non-pandemic only &#9733;</strong></td><td>111</td><td><strong>+599</strong></td><td><strong>+9.29</strong></td><td><strong>&lt;0.001***</strong></td><td><strong>0.711</strong></td><td>95% CI [472, 725]. Main spec.</td></tr>
+  </tbody></table>
+  <p style="font-size:.73rem;color:var(--grey);margin-top:5px">Newey-West HAC (lags=8). Positive &#946; reflects dissolution count as DV; prior annual spec used net enterprise change, yielding &#946;=&#8722;752 &#8212; both capture the same structural mechanism.</p>
+</div>
+
+<div id="tab-fc" class="tab">
+  <div class="kpi-row">
+    <div class="kpi red"><div class="kpi-val">547,167</div><div class="kpi-label">BAU Cumulative</div><div class="kpi-sub">Feb 2026 &#8211; Jan 2030</div></div>
+    <div class="kpi green"><div class="kpi-val">440,737</div><div class="kpi-label">Intervention Cumulative</div><div class="kpi-sub">FM1+FM2+FM3 platform</div></div>
+    <div class="kpi green"><div class="kpi-val">~106,400</div><div class="kpi-label">Businesses Saved</div><div class="kpi-sub">Conservative lower bound</div></div>
+    <div class="kpi blue"><div class="kpi-val">~2,800</div><div class="kpi-label">Ensemble OOS RMSE</div><div class="kpi-sub">Rolling 12-month backtest</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px"><h3>Historical + 48-Month Ensemble Forecast: BAU vs Intervention (FM1+FM2+FM3)</h3><div class="cw xtall"><canvas id="c-fcm"></canvas></div>
+  <div class="box" style="margin-top:10px"><strong>Ensemble model:</strong> 52% Holt linear smoothing + 48% ARIMAX(2,1,1). Holt outperforms ARIMAX OOS (2,952 vs 3,133 RMSE) &#8212; classic bias-variance tradeoff from M-competition forecasting literature. Ensemble minimises expected OOS error. The intervention 15% dissolution reduction is conservative, excluding second-order footfall and network multiplier effects.</div></div>
+  <div class="grid2">
+    <div class="card"><h3>Model Backtesting &#8212; OOS RMSE Comparison</h3><div class="cw"><canvas id="c-rmse"></canvas></div></div>
+    <div class="card"><h3>Cumulative BAU vs Intervention 2026&#8211;2030</h3><div class="cw"><canvas id="c-cum"></canvas></div></div>
+  </div>
+</div>
+
+<div id="tab-st" class="tab">
+  <div class="st">Complete Statistical Results</div>
+  <input type="text" id="sSearch" placeholder="Filter results..." oninput="fSt()" style="margin-bottom:12px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;width:280px">
+  <table><thead><tr><th>Test / Method</th><th>Statistic</th><th>Value</th><th>Interpretation</th></tr></thead><tbody id="tSt"></tbody></table>
+  <div class="st" style="margin-top:24px">Granger Causality Detail (Lags 1&#8211;12, n=118, moratorium excluded)</div>
+  <table><thead><tr><th>Lag</th><th>F-stat</th><th>p-value</th><th>Significance</th><th>Interpretation</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>25.261</td><td>&lt;0.001</td><td><span class="bdg bdg-g">*** Reject H&#8320;</span></td><td>Dominant causal lag</td></tr>
+    <tr><td>2</td><td>4.432</td><td>0.014</td><td><span class="bdg bdg-g">** Reject H&#8320;</span></td><td>Secondary lag</td></tr>
+    <tr><td>3</td><td>2.564</td><td>0.059</td><td><span class="bdg bdg-a">&#8224; Marginal</span></td><td></td></tr>
+    <tr><td>4&#8211;5</td><td>&#8804;2.10</td><td>&#8805;0.086</td><td><span class="bdg bdg-a">&#8224; Marginal</span></td><td></td></tr>
+    <tr><td>6&#8211;12</td><td>&#8804;1.53</td><td>&#8805;0.13</td><td><span class="bdg" style="background:#f1f5f9;color:#475569">Not sig.</span></td><td>Causal direction confirmed</td></tr>
+  </tbody></table>
+</div>
+
+<div id="tab-meth" class="tab">
+  <div class="grid2">
+    <div class="card"><h3>Primary Data Sources</h3>
+    <table><thead><tr><th>Dataset</th><th>n</th><th>Period</th></tr></thead><tbody>
+      <tr><td>ONS RSI J4MC (online share %)</td><td>133 months</td><td>Jan 2015&#8211;Jan 2026</td></tr>
+      <tr><td>CH dissolution panel (SIC 47xx)</td><td>666,462 companies</td><td>Jan 2015&#8211;Jan 2026</td></tr>
+      <tr><td>ONS Business Demography SIC 47</td><td>9 years</td><td>2016&#8211;2024</td></tr>
+      <tr><td>CH IDBR active businesses</td><td>430,649</td><td>Snapshot Mar 2026</td></tr>
+      <tr><td>DBT SME Digital Adoption Taskforce</td><td>10 dimensions</td><td>Jul 2025</td></tr>
+    </tbody></table></div>
+    <div class="card"><h3>Statistical Methods (13)</h3>
+    <table><thead><tr><th>Method</th><th>Key Result</th></tr></thead><tbody>
+      <tr><td>ADF unit root</td><td>Both series I(1)</td></tr>
+      <tr><td>STL decomposition</td><td>90.1% trend</td></tr>
+      <tr><td>HP filter (&#955;=1600)</td><td>Cycle SD=2.07pp</td></tr>
+      <tr><td>Chow structural break</td><td>F=133.08, Apr 2020</td></tr>
+      <tr><td>Welch t-test + Cohen's d</td><td>t=&#8722;25.50, d=4.84</td></tr>
+      <tr><td>Holt-Winters forecast</td><td>&#945;=0.78, &#946;=0.01, &#947;=0.99</td></tr>
+      <tr><td>Kaplan-Meier survival</td><td>75.7%&#8594;3.6% (5-yr)</td></tr>
+      <tr><td>Geographic heatmap</td><td>113 postcode areas</td></tr>
+      <tr><td>Engle-Granger cointegration</td><td>t=&#8722;3.161 (10% sig.)</td></tr>
+      <tr><td>OLS + Newey-West HAC</td><td>&#946;=+599, R&#178;=0.711</td></tr>
+      <tr><td>Monthly Granger causality</td><td>Lag 1: F=25.26***</td></tr>
+      <tr><td>ARIMAX+ensemble forecast</td><td>OOS RMSE&#8776;2,800</td></tr>
+      <tr><td>Counterfactual analysis</td><td>~215,800 excess</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Coordination Failure Framework &#8212; Three Failure Modes</h3>
+  <table style="margin-top:10px"><thead><tr><th>Failure Mode</th><th>Quantitative Evidence</th><th>Intervention</th></tr></thead><tbody>
+    <tr><td><strong>FM1: Discovery</strong></td><td>Online share +10.8pp above pre-COVID; non-linear threshold 20&#8211;25%; 27% SMEs have e-commerce</td><td>AI geolocation engine; LLM chatbot; verified reviews</td></tr>
+    <tr><td><strong>FM2: Presentation</strong></td><td>63pp AI gap (4% SME vs 67% large); 89.9% 12m KM survival &#8212; firms fail before digital adoption</td><td>AI product photography; business analytics dashboard</td></tr>
+    <tr><td><strong>FM3: Incentive</strong></td><td>Death rate 52&#8211;53% (2022&#8211;23); Granger lag 1&#8211;2m; 547,167 projected BAU dissolutions</td><td>GPS walking-to-reward; gamification; loyalty vouchers</td></tr>
+  </tbody></table></div>
+  <div class="card" style="margin-top:18px"><h3>Data Quality Notes</h3>
+  <div class="boxa box"><strong>Cardiff CF14 8LH:</strong> 1,892 default-address records excluded. 98.1% of apparent Cardiff records used CH's administrative default address &#8212; online-only retailers with no physical UK location.</div>
+  <div class="boxa box"><strong>Tuesday Batch Processing:</strong> 97.5% of dissolution dates fall on Tuesdays (CH admin batching). No economic meaning; monthly aggregation removes this artefact.</div>
+  <div class="boxa box"><strong>Rate-limited months:</strong> 8 months in 2016&#8211;2019 patched from manual downloads. June 2018 linearly interpolated. Feb 2025 is a lower bound (5,000-record cap).</div>
+  <div class="box"><strong>Code &amp; data:</strong> <a href="https://github.com/prudhvivkante/uk-highstreet-retail-crisis-analysis" target="_blank">github.com/prudhvivkante/uk-highstreet-retail-crisis-analysis</a></div>
+  </div>
+</div>
+
+<footer>Kante (2026) &#8212; Why Your High Street Is Emptying &nbsp;|&nbsp; Venkata Prudhvi Kante &nbsp;|&nbsp; prudhvi.ncsnlr@gmail.com &nbsp;|&nbsp; Preprint, March 2026</footer>
+
+<script>
+const D={"dissolution": [{"year_month": "2015-01", "dissolution_count": 1004}, {"year_month": "2015-02", "dissolution_count": 1304}, {"year_month": "2015-03", "dissolution_count": 1370}, {"year_month": "2015-04", "dissolution_count": 835}, {"year_month": "2015-05", "dissolution_count": 1330}, {"year_month": "2015-06", "dissolution_count": 1338}, {"year_month": "2015-07", "dissolution_count": 1129}, {"year_month": "2015-08", "dissolution_count": 1394}, {"year_month": "2015-09", "dissolution_count": 1558}, {"year_month": "2015-10", "dissolution_count": 1149}, {"year_month": "2015-11", "dissolution_count": 1338}, {"year_month": "2015-12", "dissolution_count": 1303}, {"year_month": "2016-01", "dissolution_count": 2143}, {"year_month": "2016-02", "dissolution_count": 1561}, {"year_month": "2016-03", "dissolution_count": 2054}, {"year_month": "2016-04", "dissolution_count": 995}, {"year_month": "2016-05", "dissolution_count": 956}, {"year_month": "2016-06", "dissolution_count": 1505}, {"year_month": "2016-07", "dissolution_count": 1525}, {"year_month": "2016-08", "dissolution_count": 1723}, {"year_month": "2016-09", "dissolution_count": 408}, {"year_month": "2016-10", "dissolution_count": 909}, {"year_month": "2016-11", "dissolution_count": 820}, {"year_month": "2016-12", "dissolution_count": 1633}, {"year_month": "2017-01", "dissolution_count": 1706}, {"year_month": "2017-02", "dissolution_count": 1342}, {"year_month": "2017-03", "dissolution_count": 1396}, {"year_month": "2017-04", "dissolution_count": 521}, {"year_month": "2017-05", "dissolution_count": 1900}, {"year_month": "2017-06", "dissolution_count": 647}, {"year_month": "2017-07", "dissolution_count": 1572}, {"year_month": "2017-08", "dissolution_count": 2039}, {"year_month": "2017-09", "dissolution_count": 1769}, {"year_month": "2017-10", "dissolution_count": 694}, {"year_month": "2017-11", "dissolution_count": 1455}, {"year_month": "2017-12", "dissolution_count": 629}, {"year_month": "2018-01", "dissolution_count": 3608}, {"year_month": "2018-02", "dissolution_count": 2568}, {"year_month": "2018-03", "dissolution_count": 2173}, {"year_month": "2018-04", "dissolution_count": 2660}, {"year_month": "2018-05", "dissolution_count": 579}, {"year_month": "2018-06", "dissolution_count": 2746}, {"year_month": "2018-07", "dissolution_count": 2552}, {"year_month": "2018-08", "dissolution_count": 2832}, {"year_month": "2018-09", "dissolution_count": 2750}, {"year_month": "2018-10", "dissolution_count": 3166}, {"year_month": "2018-11", "dissolution_count": 1012}, {"year_month": "2018-12", "dissolution_count": 1820}, {"year_month": "2019-01", "dissolution_count": 3699}, {"year_month": "2019-02", "dissolution_count": 2509}, {"year_month": "2019-03", "dissolution_count": 2389}, {"year_month": "2019-04", "dissolution_count": 4809}, {"year_month": "2019-05", "dissolution_count": 3321}, {"year_month": "2019-06", "dissolution_count": 933}, {"year_month": "2019-07", "dissolution_count": 3715}, {"year_month": "2019-08", "dissolution_count": 1558}, {"year_month": "2019-09", "dissolution_count": 3525}, {"year_month": "2019-10", "dissolution_count": 4181}, {"year_month": "2019-11", "dissolution_count": 3483}, {"year_month": "2019-12", "dissolution_count": 2924}, {"year_month": "2020-01", "dissolution_count": 4080}, {"year_month": "2020-02", "dissolution_count": 4574}, {"year_month": "2020-03", "dissolution_count": 4447}, {"year_month": "2020-04", "dissolution_count": 972}, {"year_month": "2020-05", "dissolution_count": 87}, {"year_month": "2020-06", "dissolution_count": 71}, {"year_month": "2020-07", "dissolution_count": 111}, {"year_month": "2020-08", "dissolution_count": 126}, {"year_month": "2020-09", "dissolution_count": 6248}, {"year_month": "2020-10", "dissolution_count": 8773}, {"year_month": "2020-11", "dissolution_count": 4482}, {"year_month": "2020-12", "dissolution_count": 2371}, {"year_month": "2021-01", "dissolution_count": 7532}, {"year_month": "2021-02", "dissolution_count": 167}, {"year_month": "2021-03", "dissolution_count": 9340}, {"year_month": "2021-04", "dissolution_count": 3459}, {"year_month": "2021-05", "dissolution_count": 2979}, {"year_month": "2021-06", "dissolution_count": 5022}, {"year_month": "2021-07", "dissolution_count": 5231}, {"year_month": "2021-08", "dissolution_count": 4271}, {"year_month": "2021-09", "dissolution_count": 7698}, {"year_month": "2021-10", "dissolution_count": 5860}, {"year_month": "2021-11", "dissolution_count": 7797}, {"year_month": "2021-12", "dissolution_count": 5359}, {"year_month": "2022-01", "dissolution_count": 6794}, {"year_month": "2022-02", "dissolution_count": 7032}, {"year_month": "2022-03", "dissolution_count": 7378}, {"year_month": "2022-04", "dissolution_count": 6716}, {"year_month": "2022-05", "dissolution_count": 7138}, {"year_month": "2022-06", "dissolution_count": 7897}, {"year_month": "2022-07", "dissolution_count": 7290}, {"year_month": "2022-08", "dissolution_count": 8838}, {"year_month": "2022-09", "dissolution_count": 7264}, {"year_month": "2022-10", "dissolution_count": 8558}, {"year_month": "2022-11", "dissolution_count": 1978}, {"year_month": "2022-12", "dissolution_count": 9113}, {"year_month": "2023-01", "dissolution_count": 1174}, {"year_month": "2023-02", "dissolution_count": 5397}, {"year_month": "2023-03", "dissolution_count": 7008}, {"year_month": "2023-04", "dissolution_count": 8073}, {"year_month": "2023-05", "dissolution_count": 9323}, {"year_month": "2023-06", "dissolution_count": 11020}, {"year_month": "2023-07", "dissolution_count": 8273}, {"year_month": "2023-08", "dissolution_count": 10497}, {"year_month": "2023-09", "dissolution_count": 8753}, {"year_month": "2023-10", "dissolution_count": 9632}, {"year_month": "2023-11", "dissolution_count": 9228}, {"year_month": "2023-12", "dissolution_count": 9231}, {"year_month": "2024-01", "dissolution_count": 11279}, {"year_month": "2024-02", "dissolution_count": 9395}, {"year_month": "2024-03", "dissolution_count": 9956}, {"year_month": "2024-04", "dissolution_count": 11329}, {"year_month": "2024-05", "dissolution_count": 9313}, {"year_month": "2024-06", "dissolution_count": 9390}, {"year_month": "2024-07", "dissolution_count": 11955}, {"year_month": "2024-08", "dissolution_count": 9880}, {"year_month": "2024-09", "dissolution_count": 11133}, {"year_month": "2024-10", "dissolution_count": 13483}, {"year_month": "2024-11", "dissolution_count": 10202}, {"year_month": "2024-12", "dissolution_count": 14910}, {"year_month": "2025-01", "dissolution_count": 4977}, {"year_month": "2025-02", "dissolution_count": 5000}, {"year_month": "2025-03", "dissolution_count": 8007}, {"year_month": "2025-04", "dissolution_count": 14460}, {"year_month": "2025-05", "dissolution_count": 11480}, {"year_month": "2025-06", "dissolution_count": 10879}, {"year_month": "2025-07", "dissolution_count": 13330}, {"year_month": "2025-08", "dissolution_count": 11352}, {"year_month": "2025-09", "dissolution_count": 13870}, {"year_month": "2025-10", "dissolution_count": 10287}, {"year_month": "2025-11", "dissolution_count": 10772}, {"year_month": "2025-12", "dissolution_count": 11914}, {"year_month": "2026-01", "dissolution_count": 10781}], "online": [{"year_month": "2015-01", "online_pct": 12.8}, {"year_month": "2015-02", "online_pct": 11.7}, {"year_month": "2015-03", "online_pct": 11.7}, {"year_month": "2015-04", "online_pct": 12.2}, {"year_month": "2015-05", "online_pct": 11.7}, {"year_month": "2015-06", "online_pct": 11.9}, {"year_month": "2015-07", "online_pct": 11.8}, {"year_month": "2015-08", "online_pct": 11.5}, {"year_month": "2015-09", "online_pct": 12.1}, {"year_month": "2015-10", "online_pct": 12.7}, {"year_month": "2015-11", "online_pct": 15.5}, {"year_month": "2015-12", "online_pct": 14.1}, {"year_month": "2016-01", "online_pct": 14.2}, {"year_month": "2016-02", "online_pct": 12.9}, {"year_month": "2016-03", "online_pct": 13.0}, {"year_month": "2016-04", "online_pct": 13.5}, {"year_month": "2016-05", "online_pct": 13.6}, {"year_month": "2016-06", "online_pct": 13.9}, {"year_month": "2016-07", "online_pct": 13.4}, {"year_month": "2016-08", "online_pct": 13.7}, {"year_month": "2016-09", "online_pct": 14.8}, {"year_month": "2016-10", "online_pct": 15.5}, {"year_month": "2016-11", "online_pct": 18.8}, {"year_month": "2016-12", "online_pct": 17.1}, {"year_month": "2017-01", "online_pct": 16.2}, {"year_month": "2017-02", "online_pct": 15.2}, {"year_month": "2017-03", "online_pct": 15.6}, {"year_month": "2017-04", "online_pct": 15.2}, {"year_month": "2017-05", "online_pct": 15.4}, {"year_month": "2017-06", "online_pct": 15.8}, {"year_month": "2017-07", "online_pct": 15.5}, {"year_month": "2017-08", "online_pct": 15.4}, {"year_month": "2017-09", "online_pct": 16.0}, {"year_month": "2017-10", "online_pct": 16.5}, {"year_month": "2017-11", "online_pct": 19.9}, {"year_month": "2017-12", "online_pct": 17.9}, {"year_month": "2018-01", "online_pct": 17.7}, {"year_month": "2018-02", "online_pct": 16.8}, {"year_month": "2018-03", "online_pct": 17.3}, {"year_month": "2018-04", "online_pct": 17.2}, {"year_month": "2018-05", "online_pct": 17.5}, {"year_month": "2018-06", "online_pct": 17.5}, {"year_month": "2018-07", "online_pct": 17.1}, {"year_month": "2018-08", "online_pct": 16.7}, {"year_month": "2018-09", "online_pct": 17.2}, {"year_month": "2018-10", "online_pct": 18.1}, {"year_month": "2018-11", "online_pct": 21.6}, {"year_month": "2018-12", "online_pct": 19.7}, {"year_month": "2019-01", "online_pct": 19.3}, {"year_month": "2019-02", "online_pct": 18.3}, {"year_month": "2019-03", "online_pct": 18.9}, {"year_month": "2019-04", "online_pct": 18.4}, {"year_month": "2019-05", "online_pct": 18.8}, {"year_month": "2019-06", "online_pct": 18.3}, {"year_month": "2019-07", "online_pct": 18.7}, {"year_month": "2019-08", "online_pct": 18.1}, {"year_month": "2019-09", "online_pct": 18.1}, {"year_month": "2019-10", "online_pct": 19.1}, {"year_month": "2019-11", "online_pct": 21.6}, {"year_month": "2019-12", "online_pct": 21.4}, {"year_month": "2020-01", "online_pct": 20.2}, {"year_month": "2020-02", "online_pct": 19.1}, {"year_month": "2020-03", "online_pct": 22.1}, {"year_month": "2020-04", "online_pct": 30.3}, {"year_month": "2020-05", "online_pct": 32.8}, {"year_month": "2020-06", "online_pct": 31.3}, {"year_month": "2020-07", "online_pct": 28.3}, {"year_month": "2020-08", "online_pct": 27.0}, {"year_month": "2020-09", "online_pct": 26.7}, {"year_month": "2020-10", "online_pct": 29.0}, {"year_month": "2020-11", "online_pct": 37.2}, {"year_month": "2020-12", "online_pct": 31.3}, {"year_month": "2021-01", "online_pct": 37.8}, {"year_month": "2021-02", "online_pct": 36.5}, {"year_month": "2021-03", "online_pct": 34.4}, {"year_month": "2021-04", "online_pct": 30.1}, {"year_month": "2021-05", "online_pct": 28.5}, {"year_month": "2021-06", "online_pct": 27.9}, {"year_month": "2021-07", "online_pct": 28.0}, {"year_month": "2021-08", "online_pct": 27.7}, {"year_month": "2021-09", "online_pct": 28.3}, {"year_month": "2021-10", "online_pct": 28.9}, {"year_month": "2021-11", "online_pct": 32.8}, {"year_month": "2021-12", "online_pct": 30.5}, {"year_month": "2022-01", "online_pct": 30.1}, {"year_month": "2022-02", "online_pct": 27.9}, {"year_month": "2022-03", "online_pct": 26.3}, {"year_month": "2022-04", "online_pct": 26.5}, {"year_month": "2022-05", "online_pct": 25.7}, {"year_month": "2022-06", "online_pct": 25.2}, {"year_month": "2022-07", "online_pct": 24.9}, {"year_month": "2022-08", "online_pct": 24.4}, {"year_month": "2022-09", "online_pct": 25.2}, {"year_month": "2022-10", "online_pct": 25.9}, {"year_month": "2022-11", "online_pct": 29.9}, {"year_month": "2022-12", "online_pct": 27.1}, {"year_month": "2023-01", "online_pct": 27.3}, {"year_month": "2023-02", "online_pct": 25.8}, {"year_month": "2023-03", "online_pct": 26.1}, {"year_month": "2023-04", "online_pct": 25.8}, {"year_month": "2023-05", "online_pct": 25.7}, {"year_month": "2023-06", "online_pct": 25.4}, {"year_month": "2023-07", "online_pct": 26.3}, {"year_month": "2023-08", "online_pct": 25.3}, {"year_month": "2023-09", "online_pct": 25.9}, {"year_month": "2023-10", "online_pct": 26.7}, {"year_month": "2023-11", "online_pct": 31.3}, {"year_month": "2023-12", "online_pct": 28.1}, {"year_month": "2024-01", "online_pct": 27.3}, {"year_month": "2024-02", "online_pct": 25.9}, {"year_month": "2024-03", "online_pct": 25.8}, {"year_month": "2024-04", "online_pct": 26.3}, {"year_month": "2024-05", "online_pct": 26.6}, {"year_month": "2024-06", "online_pct": 26.2}, {"year_month": "2024-07", "online_pct": 26.9}, {"year_month": "2024-08", "online_pct": 25.5}, {"year_month": "2024-09", "online_pct": 27.0}, {"year_month": "2024-10", "online_pct": 27.7}, {"year_month": "2024-11", "online_pct": 30.3}, {"year_month": "2024-12", "online_pct": 29.0}, {"year_month": "2025-01", "online_pct": 26.8}, {"year_month": "2025-02", "online_pct": 25.9}, {"year_month": "2025-03", "online_pct": 26.6}, {"year_month": "2025-04", "online_pct": 26.2}, {"year_month": "2025-05", "online_pct": 26.1}, {"year_month": "2025-06", "online_pct": 26.5}, {"year_month": "2025-07", "online_pct": 26.6}, {"year_month": "2025-08", "online_pct": 26.0}, {"year_month": "2025-09", "online_pct": 27.2}, {"year_month": "2025-10", "online_pct": 27.9}, {"year_month": "2025-11", "online_pct": 32.3}, {"year_month": "2025-12", "online_pct": 29.4}, {"year_month": "2026-01", "online_pct": 28.9}], "forecast": [{"month": "Feb 26", "bau": 9941, "int_": 8429, "lo": 4141, "hi": 15741}, {"month": "Mar 26", "bau": 10541, "int_": 8919, "lo": 4741, "hi": 16341}, {"month": "Apr 26", "bau": 10515, "int_": 8875, "lo": 4715, "hi": 16315}, {"month": "May 26", "bau": 10260, "int_": 8638, "lo": 4460, "hi": 16060}, {"month": "Jun 26", "bau": 10394, "int_": 8732, "lo": 4594, "hi": 16194}, {"month": "Jul 26", "bau": 10630, "int_": 8911, "lo": 4830, "hi": 16430}, {"month": "Aug 26", "bau": 10545, "int_": 8819, "lo": 4745, "hi": 16345}, {"month": "Sep 26", "bau": 11004, "int_": 9188, "lo": 5204, "hi": 16804}, {"month": "Oct 26", "bau": 11088, "int_": 9238, "lo": 5288, "hi": 16888}, {"month": "Nov 26", "bau": 10498, "int_": 8716, "lo": 4698, "hi": 16298}, {"month": "Dec 26", "bau": 10872, "int_": 9013, "lo": 5072, "hi": 16672}, {"month": "Jan 27", "bau": 10737, "int_": 8878, "lo": 4937, "hi": 16537}, {"month": "Feb 27", "bau": 10417, "int_": 8586, "lo": 4617, "hi": 16217}, {"month": "Mar 27", "bau": 11106, "int_": 9150, "lo": 5306, "hi": 16906}, {"month": "Apr 27", "bau": 11057, "int_": 9087, "lo": 5257, "hi": 16857}, {"month": "May 27", "bau": 10804, "int_": 8852, "lo": 5004, "hi": 16604}, {"month": "Jun 27", "bau": 10940, "int_": 8947, "lo": 5140, "hi": 16740}, {"month": "Jul 27", "bau": 11174, "int_": 9125, "lo": 5374, "hi": 16974}, {"month": "Aug 27", "bau": 11091, "int_": 9033, "lo": 5291, "hi": 16891}, {"month": "Sep 27", "bau": 11549, "int_": 9402, "lo": 5749, "hi": 17349}, {"month": "Oct 27", "bau": 11633, "int_": 9453, "lo": 5833, "hi": 17433}, {"month": "Nov 27", "bau": 11042, "int_": 8930, "lo": 5242, "hi": 16842}, {"month": "Dec 27", "bau": 11416, "int_": 9228, "lo": 5616, "hi": 17216}, {"month": "Jan 28", "bau": 11282, "int_": 9093, "lo": 5482, "hi": 17082}, {"month": "Feb 28", "bau": 10962, "int_": 8800, "lo": 5162, "hi": 16762}, {"month": "Mar 28", "bau": 11651, "int_": 9365, "lo": 5851, "hi": 17451}, {"month": "Apr 28", "bau": 11601, "int_": 9303, "lo": 5801, "hi": 17401}, {"month": "May 28", "bau": 11348, "int_": 9066, "lo": 5548, "hi": 17148}, {"month": "Jun 28", "bau": 11485, "int_": 9162, "lo": 5685, "hi": 17285}, {"month": "Jul 28", "bau": 11719, "int_": 9339, "lo": 5919, "hi": 17519}, {"month": "Aug 28", "bau": 11636, "int_": 9248, "lo": 5836, "hi": 17436}, {"month": "Sep 28", "bau": 12093, "int_": 9617, "lo": 6293, "hi": 17893}, {"month": "Oct 28", "bau": 12177, "int_": 9667, "lo": 6377, "hi": 17977}, {"month": "Nov 28", "bau": 11587, "int_": 9145, "lo": 5787, "hi": 17387}, {"month": "Dec 28", "bau": 11961, "int_": 9442, "lo": 6161, "hi": 17761}, {"month": "Jan 29", "bau": 11827, "int_": 9307, "lo": 6027, "hi": 17627}, {"month": "Feb 29", "bau": 11506, "int_": 9015, "lo": 5706, "hi": 17306}, {"month": "Mar 29", "bau": 12196, "int_": 9580, "lo": 6396, "hi": 17996}, {"month": "Apr 29", "bau": 12146, "int_": 9517, "lo": 6346, "hi": 17946}, {"month": "May 29", "bau": 11893, "int_": 9281, "lo": 6093, "hi": 17693}, {"month": "Jun 29", "bau": 12030, "int_": 9376, "lo": 6230, "hi": 17830}, {"month": "Jul 29", "bau": 12264, "int_": 9554, "lo": 6464, "hi": 18064}, {"month": "Aug 29", "bau": 12180, "int_": 9463, "lo": 6380, "hi": 17980}, {"month": "Sep 29", "bau": 12638, "int_": 9831, "lo": 6838, "hi": 18438}, {"month": "Oct 29", "bau": 12722, "int_": 9882, "lo": 6922, "hi": 18522}, {"month": "Nov 29", "bau": 12132, "int_": 9360, "lo": 6332, "hi": 17932}, {"month": "Dec 29", "bau": 12506, "int_": 9657, "lo": 6706, "hi": 18306}, {"month": "Jan 30", "bau": 12372, "int_": 9522, "lo": 6572, "hi": 18172}], "biz": {"years": [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024], "births": [26750, 29685, 32290, 31935, 34630, 38870, 29420, 26725, 27380], "deaths": [22110, 22820, 22555, 26705, 25485, 25265, 33170, 29200, 26100], "net": [4640, 6865, 9735, 5230, 9145, 13605, -3750, -2475, 1280]}, "km": {"cohorts": ["2010-2012", "2013-2015", "2016-2018", "2019*", "2020-2021*"], "n": [2306, 4454, 7707, 810, 1128], "months": [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78, 84], "curves": [[100, 100, 100, 99.8, 99.0, 97.3, 95.6, 93.6, 90.2, 83.7, 75.7, 63.7, 57.0, 43.3, 34.0], [100, 100, 99.9, 98.3, 92.6, 72.5, 66.1, 45.4, 35.5, 21.8, 16.6, 9.5, 5.7, 3.3, 2.9], [100, 97.1, 89.9, 42.7, 32.5, 14.3, 9.5, 5.7, 4.8, 4.1, 3.6, 2.8, 2.3, 1.6, 1.1], [100, 89.9, 86.4, 81.0, 64.3, 56.2, 53.1, 50.1, 47.9, 45.4, 44.0, 31.9, 0.6, null, null], [100, 98.6, 94.7, 63.9, 57.8, 47.2, 41.4, 25.5, 14.7, 6.2, 0.3, null, null, null, null]]}, "geo": [["N", "North London", 890, "London"], ["B", "Birmingham", 851, "Midlands"], ["E", "East London", 847, "London"], ["M", "Manchester", 724, "North"], ["WC", "Central London", 589, "London"], ["EC", "City of London", 502, "London"], ["G", "Glasgow", 477, "Scotland"], ["SE", "SE London", 459, "London"], ["W", "West London", 453, "London"], ["HA", "Harrow", 441, "London"], ["NW", "NW London", 432, "London"], ["SW", "SW London", 414, "London"], ["LE", "Leicester", 372, "Midlands"], ["CV", "Coventry", 332, "Midlands"], ["S", "Sheffield", 326, "North"], ["BT", "Belfast", 315, "Other"], ["NG", "Nottingham", 309, "Midlands"], ["DY", "Dudley", 304, "Midlands"], ["UB", "Uxbridge", 297, "London"], ["IG", "Ilford", 285, "London"], ["L", "Liverpool", 279, "North"], ["CR", "Croydon", 277, "London"], ["BN", "Brighton", 270, "Other"], ["LS", "Leeds", 262, "North"], ["BS", "Bristol", 251, "Other"], ["NE", "Newcastle", 226, "North"], ["CF", "Cardiff", 224, "Other"], ["BD", "Bradford", 220, "North"], ["PE", "Peterborough", 219, "Other"], ["EH", "Edinburgh", 214, "Scotland"]], "regimes": [["Pre-shock", "Jan 2015 - Feb 2020", 62, "1,954", "16.2%", "Stable structural growth"], ["Moratorium", "Mar 2020 - Jun 2021", 16, "3,512", "30.7%", "Government moratorium suppresses closures"], ["Rebound", "Jul 2021 - Dec 2022", 18, "6,790", "27.5%", "Pent-up dissolutions released: 3.5x pre-COVID"], ["New normal", "Jan 2023 - Jan 2026", 37, "9,917", "27.0%", "Sustained elevation: 5.1x pre-COVID"]], "stats": [["ADF dissolution (level)", "t = -1.891", "p > 0.10", "Non-stationary I(1)"], ["ADF dissolution (1st diff)", "t = -8.565", "p < 0.01", "Stationary ***"], ["ADF online share (level)", "t = -1.587", "p = 0.264", "Non-stationary I(1)"], ["ADF online share (1st diff)", "t = -8.705", "p < 0.01", "Stationary ***"], ["Chow structural break", "F(2,129) = 133.08", "p < 0.001", "Break at April 2020 ***"], ["Rolling max Chow F", "F = 153.88", "t = 63 (Apr 2020)", "Global maximum"], ["Welch t-test", "t = -25.50", "p < 10^-45", "Cohen d = 4.84"], ["Engle-Granger cointegration", "t = -3.161", "10% CV: -3.04", "Cointegrated at 10% ***"], ["OLS HAC beta (n=111)", "+599/pp", "t = 9.29, p < 0.001", "R2 = 0.711, 95% CI [472, 725]"], ["Granger lag 1", "F = 25.26", "p < 0.001", "Online share -> dissolution ***"], ["Granger lag 2", "F = 4.43", "p = 0.014", "Secondary causal lag **"], ["Counterfactual excess", "~215,800", "Mar 2020 - Jan 2026", "Above pre-COVID trend"], ["KM 5-yr survival 2010-12", "75.7%", "n = 2,306", "Baseline cohort"], ["KM 5-yr survival 2016-18", "3.6%", "n = 7,707", "20-fold collapse ***"], ["Ensemble OOS RMSE", "~2,800", "Rolling 12-month", "52% Holt + 48% ARIMAX"], ["BAU forecast 2026-2030", "547,167", "cumulative dissolutions", "Business-as-usual scenario"], ["Intervention saving", "~106,430", "businesses saved", "FM1+FM2+FM3 platform"]]};
+function showTab(n,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  btn.classList.add('active');
+}
+const C={n:'#1F4E79',b:'#2E75B6',a:'#B7770D',r:'#C04020',g:'#1E8449',gr:'#888'};
+const RC={London:C.n,Midlands:C.a,North:'#0F6E56',Scotland:'#7C3AED',Other:C.gr};
+// Counterfactual
+const dY=D.dissolution.map(d=>d.dissolution_count);
+const dX=D.dissolution.map(d=>d.year_month);
+let sx=0,sy=0,sxx=0,sxy=0,n62=62;
+for(let i=0;i<n62;i++){sx+=i;sy+=dY[i];sxx+=i*i;sxy+=i*dY[i];}
+const slope=(n62*sxy-sx*sy)/(n62*sxx-sx*sx);
+const icpt=sy/n62-slope*sx/n62;
+const cf=dX.map((_,i)=>Math.max(0,icpt+slope*i));
+function mk(id,type,data,opts){
+  const c=document.getElementById(id);if(!c)return;
+  return new Chart(c,{type,data,options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:11,padding:9}},...(opts.plugins||{})},
+    ...opts}});
+}
+// Populate tables
+const REG=[['Pre-shock','Jan 2015-Feb 2020',62,'1,954','16.2%','Stable structural growth'],
+  ['Moratorium','Mar 2020-Jun 2021',16,'3,512','30.7%','Gov moratorium suppresses closures'],
+  ['Rebound','Jul 2021-Dec 2022',18,'6,790','27.5%','Pent-up dissolutions: 3.5x pre-COVID'],
+  ['New normal','Jan 2023-Jan 2026',37,'9,917','27.0%','Sustained elevation: 5.1x pre-COVID']];
+const RCOL=['#1F4E79','#B7770D','#C04020','#8B1A1A'];
+document.getElementById('tReg').innerHTML=REG.map((r,i)=>`<tr><td><b style="color:${RCOL[i]}">${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('');
+const BY=[2016,2017,2018,2019,2020,2021,2022,2023,2024];
+const BB=[26750,29685,32290,31935,34630,38870,29420,26725,27380];
+const BD=[22110,22820,22555,26705,25485,25265,33170,29200,26100];
+const BN=[4640,6865,9735,5230,9145,13605,-3750,-2475,1280];
+const BDR=[45.2,43.5,41.1,45.5,42.4,39.4,53.0,52.2,48.8];
+const BP=['Growth','Growth','Peak positive','Slowing','COVID moratorium','Online surge','INVERSION','Net loss','Stabilising'];
+document.getElementById('tBiz').innerHTML=BY.map((y,i)=>`<tr><td>${y}</td><td>${BB[i].toLocaleString()}</td><td>${BD[i].toLocaleString()}</td><td><b style="color:${BN[i]>0?'#1E8449':'#C04020'}">${BN[i]>0?'+':''}${BN[i].toLocaleString()}</b></td><td>${BDR[i]}%</td><td>${BP[i]}</td></tr>`).join('');
+document.getElementById('tGeo').innerHTML=D.geo.map((g,i)=>`<tr><td>${i+1}</td><td><b>${g[0]}</b></td><td>${g[1]}</td><td>${g[2].toLocaleString()}</td><td style="color:${RC[g[3]]||C.gr}">${g[3]}</td></tr>`).join('');
+const ALL_ST=D.stats;
+function fSt(){const q=document.getElementById('sSearch').value.toLowerCase();document.getElementById('tSt').innerHTML=ALL_ST.filter(s=>s.join(' ').toLowerCase().includes(q)).map(s=>`<tr><td>${s[0]}</td><td><code>${s[1]}</code></td><td>${s[2]}</td><td>${s[3]}</td></tr>`).join('');}
+fSt();
+// CHARTS
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=11;
+const scY={y:{ticks:{callback:v=>v.toLocaleString()},grid:{color:'#f0f0f0'}},x:{ticks:{maxTicksLimit:9},grid:{display:false}}};
+mk('c-ovd','line',{labels:dX,datasets:[{label:'Dissolutions',data:dY,borderColor:C.n,borderWidth:1.6,pointRadius:0,backgroundColor:'rgba(31,78,121,0.06)',fill:true,tension:0.15},{label:'Counterfactual',data:cf,borderColor:C.gr,borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false}]},{scales:scY});
+// Overview scatter
+const npData=D.dissolution.filter((_,i)=>!(i>=62&&i<=77)).map(d=>{const o=D.online.find(o=>o.year_month===d.year_month);return o?{x:o.online_pct,y:d.dissolution_count}:null;}).filter(Boolean);
+mk('c-ovs','scatter',{datasets:[{label:'Monthly obs.',data:npData,backgroundColor:'rgba(31,78,121,0.5)',pointRadius:3}]},{scales:{x:{title:{display:true,text:'Online share (%)'}},y:{title:{display:true,text:'Dissolucions/month'},ticks:{callback:v=>v.toLocaleString()}}}});
+mk('c-dis','line',{labels:dX,datasets:[{label:'Actual',data:dY,borderColor:C.n,borderWidth:2,pointRadius:0,backgroundColor:'rgba(31,78,121,0.05)',fill:true,tension:0.1},{label:'Pre-COVID counterfactual',data:cf,borderColor:C.gr,borderWidth:1.2,borderDash:[5,4],pointRadius:0,fill:false}]},{scales:scY});
+// Annual bar
+const AY=[],AA=[];
+for(let y=2015;y<=2025;y++){const v=D.dissolution.filter(d=>d.year_month.startsWith(y)).map(d=>d.dissolution_count);if(v.length){AY.push(y);AA.push(Math.round(v.reduce((s,x)=>s+x,0)/v.length));}}
+mk('c-ann','bar',{labels:AY,datasets:[{label:'Avg monthly',data:AA,backgroundColor:AY.map(y=>y>=2022?'rgba(192,64,32,0.82)':y>=2020?'rgba(183,119,13,0.8)':'rgba(31,78,121,0.75)'),borderRadius:3}]},{scales:{y:{ticks:{callback:v=>v.toLocaleString()},grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}});
+mk('c-thr','bar',{labels:['<15%','15-20%','20-25%','25-30%','>30%'],datasets:[{label:'Avg dis/month',data:[1329,2185,4582,8997,8359],backgroundColor:['rgba(31,78,121,0.8)','rgba(31,78,121,0.6)','rgba(183,119,13,0.8)','rgba(192,64,32,0.8)','rgba(192,64,32,0.9)'],borderRadius:3}]},{scales:{y:{ticks:{callback:v=>v.toLocaleString()}}}});
+mk('c-biz','bar',{labels:BY,datasets:[{label:'Births',data:BB,backgroundColor:'rgba(30,132,73,0.7)',borderRadius:3,order:1},{label:'Deaths',data:BD,backgroundColor:'rgba(192,64,32,0.7)',borderRadius:3,order:2},{label:'Net change',data:BN,type:'line',borderColor:C.n,borderWidth:2.5,pointRadius:5,pointBackgroundColor:BN.map(v=>v>0?C.g:C.r),fill:false,order:0}]},{scales:{y:{ticks:{callback:v=>v.toLocaleString()},grid:{color:'#f0f0f0'}},x:{grid:{display:false}}}});
+// KM
+const KMC=[C.g,C.b,C.r,C.a,'#7C3AED'];
+mk('c-km','line',{datasets:D.km.cohorts.map((c,i)=>({label:c+' (n='+D.km.n[i].toLocaleString()+')',data:D.km.months.map((m,j)=>D.km.curves[i][j]!=null?{x:m,y:D.km.curves[i][j]}:null).filter(Boolean),borderColor:KMC[i],borderWidth:2.2,pointRadius:2.5,fill:false,tension:0.1,borderDash:i>=3?[5,4]:[]}))},{scales:{x:{type:'linear',title:{display:true,text:'Firm age (months)'},max:84},y:{title:{display:true,text:'Survival %'},min:0,max:100,ticks:{callback:v=>v+'%'}}}});
+mk('c-age','bar',{labels:['0-5m','6-11m','12-17m','18-23m','24-29m','30-35m','36-41m','42-47m','48-53m','54-59m','60-71m','72-83m'],datasets:[{label:'% of dissolved',data:[1.8,4.6,14.2,22.7,10.5,6.7,5.6,5.1,4.8,4.3,7.8,4.9],backgroundColor:['rgba(192,64,32,0.5)','rgba(192,64,32,0.7)','rgba(192,64,32,0.92)','rgba(192,64,32,0.92)','rgba(183,119,13,0.8)','rgba(183,119,13,0.6)','rgba(46,117,182,0.7)','rgba(46,117,182,0.7)','rgba(46,117,182,0.6)','rgba(46,117,182,0.6)','rgba(30,132,73,0.7)','rgba(30,132,73,0.6)'],borderRadius:2}]},{scales:{y:{title:{display:true,text:'%'}},x:{ticks:{maxRotation:45}}}});
+// Geo
+const G20=D.geo.slice(0,20);
+mk('c-geo','bar',{labels:G20.map(g=>g[0]+' '+g[1]),datasets:[{label:'Dissolutions',data:G20.map(g=>g[2]),backgroundColor:G20.map(g=>(RC[g[3]]||C.gr)+'cc'),borderRadius:2}]},{indexAxis:'y',scales:{x:{ticks:{callback:v=>v.toLocaleString()}}}});
+const RK={};D.geo.forEach(g=>{RK[g[3]]=(RK[g[3]]||0)+g[2];});
+mk('c-gpie','doughnut',{labels:Object.keys(RK),datasets:[{data:Object.values(RK),backgroundColor:Object.keys(RK).map(r=>RC[r]||C.gr)}]},{plugins:{legend:{position:'right'}}});
+// OLS scatter
+const b1val=599,b0val=-7347;
+const xr=[Math.min(...npData.map(p=>p.x)),Math.max(...npData.map(p=>p.x))];
+mk('c-ols','scatter',{datasets:[{label:'Non-pandemic months (n=111)',data:npData,backgroundColor:'rgba(31,78,121,0.5)',pointRadius:4},{label:'OLS fit: β=+599/pp, R²=0.711',data:xr.map(x=>({x,y:b0val+b1val*x})),type:'line',borderColor:C.r,borderWidth:2.5,pointRadius:0,fill:false}]},{scales:{x:{title:{display:true,text:'Online share (%)'}},y:{title:{display:true,text:'Dissolutions/month'},ticks:{callback:v=>v.toLocaleString()}}}});
+mk('c-gcf','bar',{labels:[1,2,3,4,5,6,7,8,9,10,11,12],datasets:[{label:'F-statistic',data:[25.261,4.432,2.564,2.098,1.912,1.391,1.21,1.05,0.98,0.87,0.82,0.79],backgroundColor:['rgba(30,132,73,0.9)','rgba(30,132,73,0.8)','rgba(183,119,13,0.7)','rgba(183,119,13,0.6)','rgba(183,119,13,0.5)',...Array(7).fill('rgba(136,136,136,0.4)')],borderRadius:3}]},{scales:{y:{title:{display:true,text:'F-statistic'}},x:{title:{display:true,text:'Lag (months)'},grid:{display:false}}}});
+// Forecast
+const fBAU=[...Array(dY.length).fill(null),...D.forecast.map(r=>r.bau)];
+const fINT=[...Array(dY.length).fill(null),...D.forecast.map(r=>r.int_)];
+fBAU[dY.length-1]=dY[dY.length-1];fINT[dY.length-1]=dY[dY.length-1];
+const fLab=[...dX,...D.forecast.map(r=>r.month)];
+const fHist=[...dY,...Array(D.forecast.length).fill(null)];
+mk('c-fcm','line',{labels:fLab,datasets:[{label:'Historical',data:fHist,borderColor:C.n,borderWidth:1.8,pointRadius:0,backgroundColor:'rgba(31,78,121,0.05)',fill:true,tension:0.1},{label:'BAU forecast',data:fBAU,borderColor:C.r,borderWidth:2.5,pointRadius:0,fill:false},{label:'Intervention (FM1+FM2+FM3)',data:fINT,borderColor:C.g,borderWidth:2.2,borderDash:[6,3],pointRadius:0,fill:false},{label:'Counterfactual',data:cf,borderColor:C.gr,borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false}]},{scales:{y:{ticks:{callback:v=>v.toLocaleString()},grid:{color:'#f0f0f0'}},x:{ticks:{maxTicksLimit:14},grid:{display:false}}}});
+mk('c-rmse','bar',{labels:['Holt','AR(2)','ARIMAX(1,1,0)','ARIMAX(2,1,1)','Ensemble'],datasets:[{label:'OOS RMSE',data:[2952,3111,3222,3133,2800],backgroundColor:['rgba(30,132,73,0.8)','rgba(136,136,136,0.6)','rgba(136,136,136,0.6)','rgba(136,136,136,0.6)','rgba(46,117,182,0.85)'],borderRadius:3},{label:'In-sample RMSE',data:[null,null,null,1998,null],backgroundColor:'rgba(192,64,32,0.7)',borderRadius:3}]},{scales:{y:{ticks:{callback:v=>v.toLocaleString()}}}});
+const cumB=D.forecast.reduce((a,r,i)=>[...a,(a[i-1]||0)+r.bau],[]);
+const cumI=D.forecast.reduce((a,r,i)=>[...a,(a[i-1]||0)+r.int_],[]);
+mk('c-cum','line',{labels:D.forecast.map(r=>r.month),datasets:[{label:'BAU: 547,167',data:cumB,borderColor:C.r,borderWidth:2.5,pointRadius:0,fill:false},{label:'Intervention: 440,737',data:cumI,borderColor:C.g,borderWidth:2.2,borderDash:[6,3],pointRadius:0,fill:false}]},{scales:{y:{ticks:{callback:v=>Math.round(v/1000)+'k'}},x:{ticks:{maxTicksLimit:8},grid:{display:false}}}});
+</script>
+</body>
+</html>

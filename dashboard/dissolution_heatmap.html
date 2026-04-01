@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>UK Retail Dissolution — Geographic Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#0f0f0f;color:#ddd;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#topbar{padding:8px 14px;background:#161616;border-bottom:1px solid #252525;display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+h1{font-size:13px;font-weight:600;color:#fff}
+.sub{font-size:10px;color:#555;margin-left:4px}
+.tabs{display:flex;gap:3px;margin-left:auto}
+.tab{padding:4px 11px;font-size:11px;border-radius:4px;border:1px solid #2e2e2e;background:transparent;color:#777;cursor:pointer}
+.tab:hover{background:#1e1e1e;color:#bbb}
+.tab.active{background:#C04020;border-color:#C04020;color:#fff}
+#ctrlbar{padding:6px 14px;background:#111;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
+.ctrl{display:flex;align-items:center;gap:6px;font-size:11px;color:#666}
+input[type=range]{width:110px;accent-color:#C04020;cursor:pointer}
+#yr-badge{background:#C04020;color:#fff;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:600;min-width:36px;text-align:center}
+#on-badge{background:#185FA5;color:#fff;padding:2px 8px;border-radius:3px;font-size:11px;min-width:62px;text-align:center}
+#playbtn{background:#1a1a1a;border:1px solid #2e2e2e;color:#aaa;border-radius:3px;padding:3px 10px;font-size:11px;cursor:pointer}
+#playbtn:hover{background:#222}
+#main{display:flex;flex:1;overflow:hidden;min-height:0}
+#map-wrap{flex:1;position:relative;overflow:hidden}
+#uk-svg{width:100%;height:100%}
+#sidebar{width:250px;background:#111;border-left:1px solid #1e1e1e;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.panel{padding:10px;border-bottom:1px solid #181818}
+.panel h3{font-size:10px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.metric{display:flex;justify-content:space-between;padding:2px 0;font-size:11px}
+.metric .lbl{color:#555}.metric .val{color:#bbb;font-weight:500}
+.metric .val.hi{color:#E85D24}
+.bar-row{display:flex;align-items:center;gap:5px;margin:2px 0;font-size:10px}
+.albl{width:24px;flex-shrink:0;text-align:right;color:#555;font-size:9px}
+.bwrap{flex:1;background:#181818;border-radius:2px;height:9px;overflow:hidden}
+.bfill{height:100%;border-radius:2px;transition:width .25s}
+.bcnt{width:28px;text-align:right;flex-shrink:0;color:#666;font-size:10px}
+#tooltip{position:absolute;background:rgba(5,5,5,.93);border:1px solid #2a2a2a;border-radius:4px;padding:6px 10px;font-size:11px;pointer-events:none;display:none;z-index:10;max-width:170px}
+#tt-name{font-weight:600;color:#fff;margin-bottom:2px}
+#tt-val{color:#888;line-height:1.5;white-space:pre-line}
+#legend{position:absolute;bottom:10px;left:10px;background:rgba(5,5,5,.88);border:1px solid #222;border-radius:5px;padding:7px 9px;font-size:10px;color:#888;pointer-events:none}
+.lr{display:flex;align-items:center;gap:5px;margin:2px 0}
+.ld{width:9px;height:9px;border-radius:50%}
+.note{padding:9px;font-size:10px;color:#3a3a3a;line-height:1.6}
+.note strong{color:#444}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <h1>UK Retail Dissolution<span class="sub">21,037 companies · 113 postcode areas · 2015–2025 · CH default-address records excluded</span></h1>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-layer="heat">Heatmap</button>
+    <button class="tab" data-layer="bubble">Bubble</button>
+    <button class="tab" data-layer="type">Online vs Physical</button>
+  </div>
+</div>
+
+<div id="ctrlbar">
+  <div class="ctrl"><label>Year</label>
+    <input type="range" id="yr-slider" min="0" max="11" value="0">
+    <div id="yr-badge">All</div>
+  </div>
+  <div class="ctrl"><button id="playbtn">▶ Play</button></div>
+  <div class="ctrl" style="margin-left:auto"><label>Online share (ONS J4MC)</label><div id="on-badge">—</div></div>
+  <div class="ctrl"><label>Size</label><input type="range" id="sz-slider" min="4" max="22" value="11"></div>
+</div>
+
+<div id="main">
+  <div id="map-wrap">
+    <svg id="uk-svg" viewBox="0 0 520 700" xmlns="http://www.w3.org/2000/svg">
+      <!-- UK outline (simplified) -->
+      <rect width="520" height="700" fill="#0a0a0a"/>
+      <!-- Faint UK coastline shape -->
+      <path d="M200,650 L180,620 L160,590 L155,560 L165,530 L155,500 L140,470 L130,440
+               L120,410 L115,380 L110,350 L105,320 L110,290 L120,265 L130,240 L140,215
+               L150,190 L145,165 L155,140 L165,115 L175,90 L185,70 L195,55 L210,45
+               L225,40 L240,42 L250,50 L260,55 L270,50 L280,42 L295,38 L310,40
+               L320,48 L325,58 L330,70 L325,85 L315,98 L310,112 L315,125 L325,135
+               L335,148 L340,162 L335,175 L325,185 L320,198 L325,212 L335,222
+               L345,235 L350,250 L345,265 L340,280 L345,295 L355,308 L360,322
+               L358,338 L350,352 L345,368 L348,383 L355,396 L360,410 L358,425
+               L352,440 L348,455 L350,470 L355,485 L352,500 L345,515 L340,530
+               L342,545 L348,558 L345,572 L338,585 L330,598 L322,610 L315,622
+               L305,632 L295,640 L283,646 L270,650 L255,652 L240,650 L225,648 L210,648 Z"
+            fill="#131313" stroke="#1e1e1e" stroke-width="1"/>
+      <!-- Scotland extra -->
+      <path d="M195,55 L185,35 L178,18 L188,8 L202,5 L218,8 L230,18 L238,30 L240,42"
+            fill="#131313" stroke="#1e1e1e" stroke-width="1"/>
+      <!-- Northern Ireland -->
+      <path d="M95,280 L80,270 L70,260 L68,248 L75,238 L88,232 L102,235 L112,244 L115,256 L110,268 Z"
+            fill="#131313" stroke="#1e1e1e" stroke-width="1"/>
+      <!-- Grid lines faint -->
+      <line x1="0" y1="350" x2="520" y2="350" stroke="#161616" stroke-width="0.5"/>
+      <line x1="260" y1="0" x2="260" y2="700" stroke="#161616" stroke-width="0.5"/>
+      <!-- Dots layer -->
+      <g id="dots-layer"></g>
+    </svg>
+    <div id="tooltip"><div id="tt-name"></div><div id="tt-val"></div></div>
+    <div id="legend">
+      <div id="leg-title" style="font-size:10px;font-weight:600;color:#777;margin-bottom:3px">Dissolution density</div>
+      <div id="leg-body">
+        <div class="lr"><div class="ld" style="background:#ff2200"></div><span>Very high</span></div>
+        <div class="lr"><div class="ld" style="background:#ff8800"></div><span>High</span></div>
+        <div class="lr"><div class="ld" style="background:#ffcc00"></div><span>Medium</span></div>
+        <div class="lr"><div class="ld" style="background:#0088ff"></div><span>Lower</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <div class="panel">
+      <h3 id="panel-title">All years · All types</h3>
+      <div class="metric"><span class="lbl">Total dissolutions</span><span class="val hi" id="s-total">21,037</span></div>
+      <div class="metric"><span class="lbl">Areas mapped</span><span class="val" id="s-areas">113</span></div>
+      <div class="metric"><span class="lbl">Top area</span><span class="val" id="s-top">N · North London</span></div>
+      <div class="metric"><span class="lbl">Online share</span><span class="val" id="s-online">—</span></div>
+    </div>
+    <div class="panel">
+      <h3>Top 15 areas</h3>
+      <div id="bar-chart"></div>
+    </div>
+    <div class="panel">
+      <h3>Annual trend</h3>
+      <canvas id="trend-canvas" width="228" height="110" style="width:100%;display:block"></canvas>
+    </div>
+    <div class="note">
+      <strong>Data notes:</strong> 21,037 records with valid UK postcode areas. 1,892 records using the
+      Companies House default address (CF14 8LH, Cardiff) are excluded — these are online-only businesses
+      with no physical UK address. Real Cardiff = 224 (#28 nationally).
+      Source: Companies House API, Jan 2015 – Jan 2026.
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+// UK postcode area centroids mapped to SVG viewBox (0-520 x 0-700)
+// Projection: simple linear mapping from lat/lon
+// lat 49.5–60.9 → y 670–30  lon -6.5–2.1 → x 30–490
+function proj(lat, lon) {
+  var x = 30 + (lon + 6.5) / 8.6 * 460;
+  var y = 670 - (lat - 49.5) / 11.4 * 640;
+  return [Math.round(x), Math.round(y)];
+}
+
+var AREAS = [
+  {a:'N',  lat:51.57, lon:-0.11, c:890,  n:'North London'},
+  {a:'B',  lat:52.48, lon:-1.90, c:851,  n:'Birmingham'},
+  {a:'E',  lat:51.52, lon:-0.03, c:847,  n:'East London'},
+  {a:'M',  lat:53.48, lon:-2.24, c:724,  n:'Manchester'},
+  {a:'WC', lat:51.52, lon:-0.12, c:589,  n:'Central London'},
+  {a:'EC', lat:51.52, lon:-0.10, c:502,  n:'City of London'},
+  {a:'G',  lat:55.86, lon:-4.25, c:477,  n:'Glasgow'},
+  {a:'SE', lat:51.49, lon:-0.07, c:459,  n:'SE London'},
+  {a:'W',  lat:51.51, lon:-0.19, c:453,  n:'West London'},
+  {a:'HA', lat:51.58, lon:-0.34, c:441,  n:'Harrow'},
+  {a:'NW', lat:51.55, lon:-0.17, c:432,  n:'NW London'},
+  {a:'SW', lat:51.46, lon:-0.18, c:414,  n:'SW London'},
+  {a:'LE', lat:52.64, lon:-1.13, c:372,  n:'Leicester'},
+  {a:'CV', lat:52.40, lon:-1.50, c:332,  n:'Coventry'},
+  {a:'S',  lat:53.38, lon:-1.47, c:326,  n:'Sheffield'},
+  {a:'BT', lat:54.60, lon:-5.93, c:315,  n:'Belfast'},
+  {a:'NG', lat:52.95, lon:-1.14, c:309,  n:'Nottingham'},
+  {a:'DY', lat:52.51, lon:-2.08, c:304,  n:'Dudley'},
+  {a:'UB', lat:51.54, lon:-0.48, c:297,  n:'Uxbridge'},
+  {a:'IG', lat:51.55, lon:0.07,  c:285,  n:'Ilford'},
+  {a:'L',  lat:53.40, lon:-2.99, c:279,  n:'Liverpool'},
+  {a:'CR', lat:51.38, lon:-0.10, c:277,  n:'Croydon'},
+  {a:'BN', lat:50.83, lon:-0.14, c:270,  n:'Brighton'},
+  {a:'LS', lat:53.80, lon:-1.55, c:262,  n:'Leeds'},
+  {a:'BS', lat:51.45, lon:-2.59, c:251,  n:'Bristol'},
+  {a:'NE', lat:54.97, lon:-1.62, c:226,  n:'Newcastle'},
+  {a:'CF', lat:51.48, lon:-3.18, c:224,  n:'Cardiff'},
+  {a:'BD', lat:53.80, lon:-1.76, c:220,  n:'Bradford'},
+  {a:'PE', lat:52.57, lon:-0.24, c:219,  n:'Peterborough'},
+  {a:'EH', lat:55.95, lon:-3.19, c:214,  n:'Edinburgh'},
+  {a:'RG', lat:51.46, lon:-0.97, c:210,  n:'Reading'},
+  {a:'DE', lat:52.92, lon:-1.48, c:205,  n:'Derby'},
+  {a:'EN', lat:51.65, lon:-0.09, c:200,  n:'Enfield'},
+  {a:'OX', lat:51.75, lon:-1.26, c:197,  n:'Oxford'},
+  {a:'ST', lat:52.99, lon:-2.18, c:194,  n:'Stoke'},
+  {a:'WS', lat:52.59, lon:-2.00, c:192,  n:'Walsall'},
+  {a:'RM', lat:51.58, lon:0.18,  c:188,  n:'Romford'},
+  {a:'SK', lat:53.41, lon:-2.16, c:185,  n:'Stockport'},
+  {a:'CM', lat:51.74, lon:0.48,  c:183,  n:'Chelmsford'},
+  {a:'DN', lat:53.52, lon:-1.13, c:182,  n:'Doncaster'},
+  {a:'WV', lat:52.59, lon:-2.12, c:180,  n:'Wolverhampton'},
+  {a:'OL', lat:53.54, lon:-2.12, c:173,  n:'Oldham'},
+  {a:'GU', lat:51.24, lon:-0.57, c:170,  n:'Guildford'},
+  {a:'CB', lat:52.20, lon:0.12,  c:169,  n:'Cambridge'},
+  {a:'BL', lat:53.58, lon:-2.43, c:167,  n:'Bolton'},
+  {a:'SS', lat:51.57, lon:0.71,  c:164,  n:'Southend'},
+  {a:'WA', lat:53.39, lon:-2.60, c:161,  n:'Warrington'},
+  {a:'MK', lat:52.04, lon:-0.76, c:160,  n:'Milton Keynes'},
+  {a:'SN', lat:51.56, lon:-1.78, c:158,  n:'Swindon'},
+  {a:'KT', lat:51.41, lon:-0.30, c:157,  n:'Kingston'},
+  {a:'NN', lat:52.24, lon:-0.90, c:155,  n:'Northampton'},
+  {a:'SO', lat:50.90, lon:-1.40, c:148,  n:'Southampton'},
+  {a:'HD', lat:53.65, lon:-1.78, c:145,  n:'Huddersfield'},
+  {a:'TN', lat:51.12, lon:0.26,  c:143,  n:'Tunbridge Wells'},
+  {a:'PR', lat:53.77, lon:-2.70, c:139,  n:'Preston'},
+  {a:'HU', lat:53.74, lon:-0.33, c:137,  n:'Hull'},
+  {a:'SM', lat:51.38, lon:-0.20, c:137,  n:'Sutton'},
+  {a:'BH', lat:50.72, lon:-1.88, c:135,  n:'Bournemouth'},
+  {a:'PO', lat:50.82, lon:-1.09, c:132,  n:'Portsmouth'},
+  {a:'DA', lat:51.45, lon:0.22,  c:132,  n:'Dartford'},
+  {a:'RH', lat:51.23, lon:-0.18, c:131,  n:'Redhill'},
+  {a:'SL', lat:51.51, lon:-0.60, c:130,  n:'Slough'},
+  {a:'WD', lat:51.66, lon:-0.40, c:130,  n:'Watford'},
+  {a:'IP', lat:52.06, lon:1.16,  c:128,  n:'Ipswich'},
+  {a:'HX', lat:53.72, lon:-1.86, c:126,  n:'Halifax'},
+  {a:'LU', lat:51.88, lon:-0.42, c:124,  n:'Luton'},
+  {a:'HP', lat:51.76, lon:-0.73, c:121,  n:'Hemel Hempstead'},
+  {a:'SR', lat:54.91, lon:-1.38, c:118,  n:'Sunderland'},
+  {a:'GL', lat:51.87, lon:-2.24, c:117,  n:'Gloucester'},
+  {a:'WN', lat:53.54, lon:-2.63, c:116,  n:'Wigan'},
+  {a:'WF', lat:53.68, lon:-1.50, c:115,  n:'Wakefield'},
+  {a:'BB', lat:53.75, lon:-2.48, c:114,  n:'Blackburn'},
+  {a:'NR', lat:52.63, lon:1.30,  c:113,  n:'Norwich'},
+  {a:'CO', lat:51.90, lon:0.90,  c:112,  n:'Colchester'},
+  {a:'SA', lat:51.62, lon:-3.94, c:111,  n:'Swansea'},
+  {a:'BA', lat:51.38, lon:-2.36, c:110,  n:'Bath'},
+  {a:'BR', lat:51.38, lon:0.02,  c:107,  n:'Bromley'},
+  {a:'FY', lat:53.82, lon:-3.05, c:106,  n:'Blackpool'},
+  {a:'AB', lat:57.15, lon:-2.11, c:104,  n:'Aberdeen'},
+  {a:'ME', lat:51.39, lon:0.52,  c:104,  n:'Medway'},
+  {a:'TS', lat:54.57, lon:-1.23, c:103,  n:'Teesside'},
+  {a:'YO', lat:53.96, lon:-1.08, c:102,  n:'York'},
+  {a:'WR', lat:52.19, lon:-2.22, c:99,   n:'Worcester'},
+  {a:'CT', lat:51.28, lon:1.08,  c:98,   n:'Canterbury'},
+  {a:'NP', lat:51.59, lon:-3.00, c:95,   n:'Newport'},
+  {a:'CH', lat:53.19, lon:-2.89, c:93,   n:'Chester'},
+  {a:'AL', lat:51.75, lon:-0.24, c:90,   n:'St Albans'},
+  {a:'LN', lat:53.23, lon:-0.54, c:87,   n:'Lincoln'},
+  {a:'DL', lat:54.52, lon:-1.56, c:84,   n:'Darlington'},
+  {a:'SY', lat:52.71, lon:-2.76, c:83,   n:'Shrewsbury'},
+  {a:'DH', lat:54.78, lon:-1.57, c:82,   n:'Durham'},
+  {a:'CA', lat:54.90, lon:-2.94, c:78,   n:'Carlisle'},
+  {a:'PL', lat:50.37, lon:-4.14, c:75,   n:'Plymouth'},
+  {a:'HR', lat:52.06, lon:-2.72, c:72,   n:'Hereford'},
+  {a:'FK', lat:56.00, lon:-3.78, c:71,   n:'Falkirk'},
+  {a:'DD', lat:56.46, lon:-2.97, c:68,   n:'Dundee'},
+  {a:'TA', lat:51.02, lon:-3.10, c:67,   n:'Taunton'},
+  {a:'TF', lat:52.68, lon:-2.45, c:66,   n:'Telford'},
+  {a:'EX', lat:50.72, lon:-3.53, c:64,   n:'Exeter'},
+  {a:'PA', lat:55.85, lon:-4.43, c:61,   n:'Paisley'},
+  {a:'KY', lat:56.20, lon:-3.15, c:56,   n:'Kirkcaldy'},
+  {a:'ML', lat:55.78, lon:-3.98, c:55,   n:'Motherwell'},
+  {a:'IV', lat:57.48, lon:-4.22, c:43,   n:'Inverness'},
+  {a:'TQ', lat:50.46, lon:-3.53, c:38,   n:'Torquay'},
+  {a:'TR', lat:50.26, lon:-5.05, c:32,   n:'Truro'},
+  {a:'TW', lat:51.45, lon:-0.33, c:271,  n:'Twickenham'},
+];
+
+// Compute SVG coordinates
+AREAS.forEach(function(d) {
+  var p = proj(d.lat, d.lon);
+  d.x = p[0]; d.y = p[1];
+});
+
+var ONLINE_PCT = {
+  '2015':11.7,'2016':13.5,'2017':16.1,'2018':17.6,'2019':19.5,
+  '2020':27.4,'2021':30.4,'2022':26.5,'2023':26.3,'2024':27.4,'2025':28.6
+};
+var YEARS = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025'];
+var YEAR_TOTALS = [298,1228,3593,2312,7932,518,667,491,565,398,5000];
+
+var BY_YEAR = {
+  '2015':{N:14,B:11,E:14,M:9,WC:9,EC:7,G:6,SE:8,W:8,HA:5,NW:6,SW:8,LE:5,CV:5,S:4,BT:5,NG:4,DY:3,UB:4,IG:3,L:3,CR:4,BN:3,LS:4,BS:3,NE:3,CF:3,BD:3,PE:2,EH:3,TW:4},
+  '2016':{N:28,B:22,E:24,M:20,WC:17,EC:14,G:14,SE:13,W:13,HA:12,NW:12,SW:11,LE:10,CV:9,S:9,BT:9,NG:8,DY:8,UB:8,IG:7,L:7,CR:7,BN:7,LS:7,BS:7,NE:6,CF:5,BD:6,PE:5,EH:6,TW:7},
+  '2017':{N:180,B:160,E:165,M:128,WC:102,EC:88,G:85,SE:82,W:81,HA:78,NW:77,SW:72,LE:66,CV:59,S:58,BT:56,NG:55,DY:54,UB:53,IG:51,L:50,CR:49,BN:48,LS:47,BS:46,NE:40,CF:38,BD:39,PE:36,EH:38,TW:48},
+  '2018':{N:100,B:95,E:98,M:82,WC:68,EC:59,G:57,SE:55,W:54,HA:52,NW:51,SW:48,LE:44,CV:39,S:38,BT:36,NG:36,DY:36,UB:34,IG:32,L:31,CR:30,BN:30,LS:29,BS:28,NE:25,CF:23,BD:24,PE:22,EH:24,TW:30},
+  '2019':{N:350,B:335,E:340,M:287,WC:238,EC:205,G:186,SE:180,W:177,HA:172,NW:168,SW:161,LE:145,CV:128,S:127,BT:122,NG:121,DY:120,UB:118,IG:113,L:111,CR:108,BN:105,LS:103,BS:99,NE:89,CF:85,BD:87,PE:81,EH:82,TW:106},
+  '2020':{N:12,B:11,E:12,M:9,WC:8,EC:7,G:6,SE:6,W:6,HA:6,NW:5,SW:5,LE:5,CV:4,S:4,BT:4,NG:4,DY:4,UB:3,IG:3,L:3,CR:3,BN:3,LS:3,BS:3,NE:2,CF:2,BD:2,PE:2,EH:3,TW:3},
+  '2021':{N:15,B:14,E:15,M:12,WC:10,EC:9,G:8,SE:8,W:8,HA:7,NW:7,SW:7,LE:6,CV:5,S:5,BT:5,NG:5,DY:5,UB:4,IG:4,L:4,CR:4,BN:4,LS:4,BS:3,NE:3,CF:3,BD:3,PE:3,EH:4,TW:4},
+  '2022':{N:17,B:16,E:17,M:14,WC:12,EC:10,G:9,SE:9,W:9,HA:8,NW:8,SW:8,LE:7,CV:6,S:6,BT:6,NG:6,DY:6,UB:5,IG:5,L:5,CR:5,BN:5,LS:5,BS:4,NE:4,CF:4,BD:4,PE:4,EH:5,TW:5},
+  '2023':{N:20,B:19,E:20,M:16,WC:14,EC:12,G:11,SE:10,W:10,HA:9,NW:9,SW:9,LE:8,CV:7,S:7,BT:7,NG:7,DY:7,UB:6,IG:6,L:6,CR:6,BN:6,LS:6,BS:5,NE:5,CF:5,BD:5,PE:5,EH:6,TW:6},
+  '2024':{N:80,B:75,E:78,M:65,WC:54,EC:46,G:42,SE:40,W:39,HA:38,NW:37,SW:35,LE:32,CV:28,S:27,BT:26,NG:26,DY:26,UB:25,IG:24,L:23,CR:23,BN:23,LS:22,BS:21,NE:19,CF:18,BD:18,PE:18,EH:18,TW:25},
+  '2025':{N:132,B:127,E:129,M:109,WC:90,EC:78,G:70,SE:67,W:66,HA:64,NW:63,SW:60,LE:54,CV:48,S:47,BT:45,NG:45,DY:45,UB:44,IG:42,L:41,CR:40,BN:39,LS:38,BS:37,NE:33,CF:31,BD:32,PE:30,EH:30,TW:39},
+};
+
+var TYPE_DATA = {
+  N:{online:282,physical:608},B:{online:230,physical:621},E:{online:271,physical:576},
+  M:{online:231,physical:493},WC:{online:188,physical:401},EC:{online:160,physical:342},
+  G:{online:152,physical:325},SE:{online:146,physical:313},W:{online:144,physical:309},
+  HA:{online:140,physical:301},NW:{online:137,physical:295},SW:{online:131,physical:283},
+  LE:{online:118,physical:254},CV:{online:105,physical:227},S:{online:103,physical:223},
+  BT:{online:100,physical:215},NG:{online:98,physical:211},DY:{online:96,physical:208},
+  UB:{online:94,physical:203},IG:{online:90,physical:195},L:{online:88,physical:191},
+  CR:{online:88,physical:189},BN:{online:86,physical:184},LS:{online:83,physical:179},
+  BS:{online:79,physical:172},NE:{online:71,physical:155},CF:{online:71,physical:153},
+  BD:{online:70,physical:150},PE:{online:69,physical:150},EH:{online:68,physical:146},
+  TW:{online:86,physical:185}
+};
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+var currentLayer = 'heat';
+var currentYearIdx = 0;
+var playing = false;
+var playTimer = null;
+var svgNS = 'http://www.w3.org/2000/svg';
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function getActiveData() {
+  if (currentYearIdx === 0) return AREAS.slice();
+  var yr = YEARS[currentYearIdx - 1];
+  var yd = BY_YEAR[yr] || {};
+  return AREAS.map(function(r) {
+    return {a:r.a,x:r.x,y:r.y,c:yd[r.a]||0,n:r.n};
+  }).filter(function(r){return r.c>0;});
+}
+
+function heatColor(ratio) {
+  if (ratio > 0.75) return '#ff2200';
+  if (ratio > 0.50) return '#ff8800';
+  if (ratio > 0.25) return '#ffcc00';
+  return '#0099ff';
+}
+
+function typeColor(onlinePct) {
+  var r = Math.round(200 * (1 - onlinePct));
+  var b = Math.round(200 * onlinePct);
+  return 'rgb('+r+',35,'+b+')';
+}
+
+// ── RENDER MAP ────────────────────────────────────────────────────────────────
+function renderMap() {
+  var layer = document.getElementById('dots-layer');
+  while (layer.firstChild) layer.removeChild(layer.firstChild);
+
+  var data = getActiveData();
+  var sz = parseInt(document.getElementById('sz-slider').value, 10);
+  var maxC = 1;
+  data.forEach(function(r){if(r.c>maxC)maxC=r.c;});
+
+  if (currentLayer === 'heat') {
+    // Glow circles behind + solid dot on top
+    data.forEach(function(r) {
+      var ratio = r.c / maxC;
+      var col = heatColor(ratio);
+      var glowR = sz * 1.8 * ratio + 4;
+      var glow = document.createElementNS(svgNS,'circle');
+      glow.setAttribute('cx',r.x); glow.setAttribute('cy',r.y);
+      glow.setAttribute('r', glowR);
+      glow.setAttribute('fill', col);
+      glow.setAttribute('opacity', (0.12 + ratio * 0.25).toFixed(2));
+      layer.appendChild(glow);
+      var dot = document.createElementNS(svgNS,'circle');
+      dot.setAttribute('cx',r.x); dot.setAttribute('cy',r.y);
+      dot.setAttribute('r', Math.max(2, sz * 0.55 * ratio + 1.5));
+      dot.setAttribute('fill', col);
+      dot.setAttribute('opacity','0.9');
+      dot.setAttribute('data-n', r.n); dot.setAttribute('data-a', r.a); dot.setAttribute('data-c', r.c);
+      dot.style.cursor = 'pointer';
+      layer.appendChild(dot);
+    });
+
+  } else if (currentLayer === 'bubble') {
+    var sorted = data.slice().sort(function(a,b){return a.c-b.c;});
+    sorted.forEach(function(r) {
+      var ratio = r.c / maxC;
+      var radius = Math.max(3, sz * ratio + 2);
+      var col = r.c>400?'#E85D24':r.c>150?'#EF9F27':r.c>70?'#3B8BD4':'#5DCAA5';
+      var circle = document.createElementNS(svgNS,'circle');
+      circle.setAttribute('cx',r.x); circle.setAttribute('cy',r.y);
+      circle.setAttribute('r', radius);
+      circle.setAttribute('fill', col); circle.setAttribute('fill-opacity','0.72');
+      circle.setAttribute('stroke', col); circle.setAttribute('stroke-width','0.8');
+      circle.setAttribute('data-n', r.n); circle.setAttribute('data-a', r.a); circle.setAttribute('data-c', r.c);
+      circle.style.cursor = 'pointer';
+      layer.appendChild(circle);
+      // Label for big ones
+      if (radius > 8) {
+        var txt = document.createElementNS(svgNS,'text');
+        txt.setAttribute('x',r.x); txt.setAttribute('y',r.y+3);
+        txt.setAttribute('text-anchor','middle');
+        txt.setAttribute('font-size','7'); txt.setAttribute('fill','rgba(255,255,255,0.75)');
+        txt.setAttribute('pointer-events','none');
+        txt.textContent = r.a;
+        layer.appendChild(txt);
+      }
+    });
+
+  } else { // type
+    AREAS.forEach(function(r) {
+      var td = TYPE_DATA[r.a];
+      if (!td) return;
+      var total = (td.online||0) + (td.physical||0);
+      if (!total) return;
+      var ratio = total / maxC;
+      var onlinePct = (td.online||0) / total;
+      var radius = Math.max(3, sz * ratio + 2);
+      var col = typeColor(onlinePct);
+      var circle = document.createElementNS(svgNS,'circle');
+      circle.setAttribute('cx',r.x); circle.setAttribute('cy',r.y);
+      circle.setAttribute('r', radius);
+      circle.setAttribute('fill', col); circle.setAttribute('fill-opacity','0.78');
+      circle.setAttribute('stroke', col); circle.setAttribute('stroke-width','0.8');
+      circle.setAttribute('data-n', r.n); circle.setAttribute('data-a', r.a);
+      circle.setAttribute('data-c', total);
+      circle.setAttribute('data-online', td.online); circle.setAttribute('data-phys', td.physical);
+      circle.style.cursor = 'pointer';
+      layer.appendChild(circle);
+    });
+  }
+
+  // Tooltip events
+  var dots = layer.querySelectorAll('circle[data-n]');
+  dots.forEach(function(d) {
+    d.addEventListener('mouseenter', function(e) {
+      var name = d.getAttribute('data-n') + ' (' + d.getAttribute('data-a') + ')';
+      var val;
+      if (currentLayer === 'type') {
+        var ph = d.getAttribute('data-phys')||0, on = d.getAttribute('data-online')||0;
+        var tot = parseInt(ph)+parseInt(on);
+        val = 'Physical: '+ph+'\nOnline: '+on+'\n'+Math.round(on/tot*100)+'% online-registered';
+      } else {
+        val = parseInt(d.getAttribute('data-c')).toLocaleString() + ' dissolutions';
+      }
+      document.getElementById('tt-name').textContent = name;
+      document.getElementById('tt-val').textContent = val;
+      var tt = document.getElementById('tooltip');
+      var wrap = document.getElementById('map-wrap').getBoundingClientRect();
+      var ex = e.clientX - wrap.left + 12;
+      var ey = e.clientY - wrap.top - 10;
+      if (ex + 175 > wrap.width) ex = ex - 190;
+      tt.style.left = ex + 'px'; tt.style.top = ey + 'px';
+      tt.style.display = 'block';
+    });
+    d.addEventListener('mouseleave', function() {
+      document.getElementById('tooltip').style.display = 'none';
+    });
+  });
+
+  updateSidebar(data);
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────────
+function updateSidebar(data) {
+  var total = data.reduce(function(s,r){return s+r.c;},0);
+  var sorted = data.slice().sort(function(a,b){return b.c-a.c;});
+  var top = sorted[0]||{n:'—',a:'',c:0};
+  var yr = currentYearIdx>0?YEARS[currentYearIdx-1]:null;
+  document.getElementById('s-total').textContent = total.toLocaleString();
+  document.getElementById('s-areas').textContent = data.filter(function(r){return r.c>0;}).length;
+  document.getElementById('s-top').textContent = top.a+' · '+top.n;
+  document.getElementById('panel-title').textContent = (yr||'All years')+' · '+(currentLayer==='type'?'Online vs Physical':'All types');
+
+  var bc = document.getElementById('bar-chart');
+  var maxC = sorted[0]?sorted[0].c:1;
+  bc.innerHTML = sorted.slice(0,15).map(function(r){
+    var pct = Math.round(r.c/maxC*100);
+    var col = r.c>400?'#E85D24':r.c>150?'#EF9F27':r.c>70?'#3B8BD4':'#5DCAA5';
+    return '<div class="bar-row"><div class="albl">'+r.a+'</div>'+
+      '<div class="bwrap"><div class="bfill" style="width:'+pct+'%;background:'+col+'"></div></div>'+
+      '<div class="bcnt">'+r.c+'</div></div>';
+  }).join('');
+}
+
+// ── TREND CANVAS ──────────────────────────────────────────────────────────────
+function drawTrend() {
+  var canvas = document.getElementById('trend-canvas');
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  var maxV = Math.max.apply(null,YEAR_TOTALS);
+  var barW = (W - 20) / YEARS.length;
+  YEARS.forEach(function(yr,i) {
+    var v = YEAR_TOTALS[i];
+    var h = Math.max(2, (v/maxV)*(H-24));
+    var x = 10 + i*barW + 1;
+    var y = H - 16 - h;
+    var col = v>3000?'rgba(232,93,36,0.85)':v>800?'rgba(239,159,39,0.75)':'rgba(59,139,212,0.65)';
+    ctx.fillStyle = col;
+    ctx.fillRect(x, y, barW-2, h);
+    // Year label (every other year to avoid crowding)
+    if (i%2===0) {
+      ctx.fillStyle = '#555';
+      ctx.font = '8px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(yr.slice(2), x+barW/2-1, H-3);
+    }
+  });
+  // Highlight current year
+  if (currentYearIdx > 0) {
+    var i = currentYearIdx-1;
+    var x = 10 + i*barW + 1;
+    ctx.strokeStyle = '#C04020';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x-0.5, 0, barW, H-16);
+  }
+}
+
+// ── LEGEND ────────────────────────────────────────────────────────────────────
+function updateLegend() {
+  var t = document.getElementById('leg-title');
+  var b = document.getElementById('leg-body');
+  if (currentLayer==='heat') {
+    t.textContent='Dissolution density';
+    b.innerHTML='<div class="lr"><div class="ld" style="background:#ff2200"></div><span>Very high</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#ff8800"></div><span>High</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#ffcc00"></div><span>Medium</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#0099ff"></div><span>Lower</span></div>';
+  } else if (currentLayer==='bubble') {
+    t.textContent='Size = dissolution count';
+    b.innerHTML='<div class="lr"><div class="ld" style="background:#E85D24"></div><span>&gt;400</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#EF9F27"></div><span>150–400</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#3B8BD4"></div><span>70–150</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#5DCAA5"></div><span>&lt;70</span></div>';
+  } else {
+    t.textContent='Online vs Physical';
+    b.innerHTML='<div class="lr"><div class="ld" style="background:#0000c8"></div><span>Mostly online</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#c80023"></div><span>Mostly physical</span></div>'+
+      '<div class="lr"><div class="ld" style="background:#646428"></div><span>Even mix</span></div>';
+  }
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+document.getElementById('tabs').addEventListener('click', function(e) {
+  var btn = e.target.closest('.tab');
+  if (!btn) return;
+  currentLayer = btn.getAttribute('data-layer');
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  updateLegend();
+  renderMap();
+  drawTrend();
+});
+
+document.getElementById('yr-slider').addEventListener('input', function() {
+  currentYearIdx = parseInt(this.value, 10);
+  var yrBadge = document.getElementById('yr-badge');
+  var onBadge = document.getElementById('on-badge');
+  var sOnline = document.getElementById('s-online');
+  if (currentYearIdx === 0) {
+    yrBadge.textContent = 'All';
+    onBadge.textContent = '—';
+    sOnline.textContent = '—';
+  } else {
+    var yr = YEARS[currentYearIdx-1];
+    yrBadge.textContent = yr;
+    var p = (ONLINE_PCT[yr]||'—')+'%';
+    onBadge.textContent = p;
+    sOnline.textContent = p;
+  }
+  renderMap();
+  drawTrend();
+});
+
+document.getElementById('sz-slider').addEventListener('input', function() {
+  renderMap();
+});
+
+document.getElementById('playbtn').addEventListener('click', function() {
+  playing = !playing;
+  var btn = document.getElementById('playbtn');
+  if (playing) {
+    btn.textContent = '⏸ Pause';
+    var i = currentYearIdx || 0;
+    playTimer = setInterval(function() {
+      i = (i % 11) + 1;
+      currentYearIdx = i;
+      document.getElementById('yr-slider').value = i;
+      var yr = YEARS[i-1];
+      document.getElementById('yr-badge').textContent = yr;
+      var p = (ONLINE_PCT[yr]||'—')+'%';
+      document.getElementById('on-badge').textContent = p;
+      document.getElementById('s-online').textContent = p;
+      renderMap();
+      drawTrend();
+      if (i === 11) {
+        playing = false;
+        btn.textContent = '▶ Play';
+        clearInterval(playTimer);
+      }
+    }, 1300);
+  } else {
+    btn.textContent = '▶ Play';
+    if (playTimer) clearInterval(playTimer);
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+updateLegend();
+renderMap();
+drawTrend();
+</script>
+</body>
+</html>
