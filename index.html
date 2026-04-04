@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK High Street Retail Crisis Analysis</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 860px; margin: 60px auto; padding: 0 24px; background: #f6f8fa; color: #24292f; }
+    h1 { font-size: 1.8rem; margin-bottom: 8px; }
+    p.subtitle { color: #57606a; margin-bottom: 40px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    a.card { display: block; background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 24px 20px; text-decoration: none; color: #24292f; transition: box-shadow 0.15s; }
+    a.card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    a.card h2 { font-size: 1rem; margin: 0 0 8px; }
+    a.card p { font-size: 0.85rem; color: #57606a; margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>UK High Street Retail Crisis Analysis</h1>
+  <p class="subtitle">Granger causality between UK online retail penetration and enterprise dissolution &mdash; Kante (2026)</p>
+  <div class="grid">
+    <a class="card" href="dashboard/analysis_dashboard.html">
+      <h2>Analysis Dashboard</h2>
+      <p>Main analysis and Granger causality results</p>
+    </a>
+    <a class="card" href="dashboard/dissolution_heatmap.html">
+      <h2>Dissolution Heatmap</h2>
+      <p>Geographic view of enterprise dissolution</p>
+    </a>
+    <a class="card" href="dashboard/forecast_dashboard.html">
+      <h2>Forecast Dashboard</h2>
+      <p>Retail penetration and dissolution forecasts</p>
+    </a>
+    <a class="card" href="dashboard/model_comparison.html">
+      <h2>Model Comparison</h2>
+      <p>Comparison of statistical models used</p>
+    </a>
+  </div>
+</body>
+</html>
