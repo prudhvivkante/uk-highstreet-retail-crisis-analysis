@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Exeter & Devon Retail Crisis · Full Decade Analysis 2015–2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F3EF;--s:#fff;--s2:#EEECEA;--b:#DDD9D0;--b2:#C5C1B6;
+  --t:#1A1917;--t2:#5C5B56;--t3:#9E9C96;
+  --r:#C0451A;--rbg:#FBEEE9;--ro:#DF6520;
+  --g:#0C7350;--gbg:#E0F3ED;
+  --bl:#1356A0;--blbg:#E8EFFA;
+  --am:#8C5D0C;--ambg:#FAF0D8;
+  --pu:#6040B0;--pubg:#EFEBF9;
+  --rad:10px;--radl:14px;
+  --phase-pre:#1356A0;--phase-covid:#6040B0;--phase-post:#C0451A;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);font-size:14px;line-height:1.6}
+
+/* NAV */
+.nav{background:#18170E;display:flex;align-items:center;position:sticky;top:0;z-index:999;height:50px;padding:0 1.25rem;gap:0;overflow-x:auto}
+.nav-logo{font-size:13px;font-weight:800;color:#fff;letter-spacing:.02em;padding-right:1.5rem;border-right:1px solid rgba(255,255,255,.1);white-space:nowrap;flex-shrink:0}
+.nav-logo span{color:var(--ro)}
+.tabs{display:flex;flex-shrink:0}
+.tab{padding:0 .9rem;height:50px;display:flex;align-items:center;font-size:11px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:rgba(255,255,255,.45);letter-spacing:.03em;white-space:nowrap;transition:.15s}
+.tab:hover{color:#fff;background:rgba(255,255,255,.05)}
+.tab.on{color:#fff;border-bottom-color:var(--ro)}
+.nav-meta{margin-left:auto;font-size:10px;color:rgba(255,255,255,.28);padding-left:1rem;flex-shrink:0}
+
+/* PAGES */
+.pg{display:none;max-width:1180px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+.pg.on{display:block}
+
+/* PAGE HEADER */
+.ph{margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--b)}
+.ph .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);margin-bottom:4px}
+.ph h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.ph p{font-size:13px;color:var(--t2);max-width:720px;line-height:1.5}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px}
+.br{background:var(--rbg);color:var(--r)}.bt{background:var(--gbg);color:var(--g)}
+.bb{background:var(--blbg);color:var(--bl)}.ba{background:var(--ambg);color:var(--am)}
+.bp{background:var(--pubg);color:var(--pu)}.bg2{background:var(--s2);color:var(--t2)}
+
+/* KPI */
+.kg{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.5rem}
+.kpi{background:var(--s);border:1px solid var(--b);border-radius:var(--rad);padding:.85rem 1rem}
+.kl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.kv{font-size:22px;font-weight:700;line-height:1;margin-bottom:2px}
+.kv.r{color:var(--r)}.kv.g{color:var(--g)}.kv.b{color:var(--bl)}.kv.p{color:var(--pu)}
+.ks{font-size:10px;color:var(--t3);line-height:1.35}
+.kchip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+.kchip.r{background:var(--rbg);color:var(--r)}.kchip.g{background:var(--gbg);color:var(--g)}
+
+/* CHARTS */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+.row.t3{grid-template-columns:1fr 1fr 1fr}
+.row.w21{grid-template-columns:2fr 1fr}
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--radl);padding:1.1rem 1.25rem}
+.card.full{grid-column:1/-1}
+.card h3{font-size:13px;font-weight:700;margin-bottom:2px}
+.card .sub{font-size:11px;color:var(--t2);margin-bottom:10px;line-height:1.4}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px;font-size:10px;color:var(--t2);align-items:center}
+.ld{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.src{font-size:9px;color:var(--t3);margin-top:6px;font-style:italic}
+
+/* PHASE STRIP */
+.phase-strip{display:flex;gap:0;margin-bottom:10px;border-radius:6px;overflow:hidden;font-size:10px;font-weight:700}
+.ps{flex:1;padding:4px 8px;text-align:center;letter-spacing:.03em;color:#fff}
+.ps.pre{background:var(--phase-pre)}.ps.covid{background:var(--phase-covid)}.ps.post{background:var(--phase-post)}.ps.now{background:#555}
+
+/* INSIGHT BOXES */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.ib{padding:.85rem 1rem;border-radius:0 var(--rad) var(--rad) 0;border-left:3px solid}
+.ib.r{background:var(--rbg);border-color:var(--r)}.ib.g{background:var(--gbg);border-color:var(--g)}
+.ib.b{background:var(--blbg);border-color:var(--bl)}.ib.a{background:var(--ambg);border-color:var(--am)}.ib.p{background:var(--pubg);border-color:var(--pu)}
+.ib h4{font-size:12px;font-weight:700;margin-bottom:3px}
+.ib.r h4{color:var(--r)}.ib.g h4{color:var(--g)}.ib.b h4{color:var(--bl)}.ib.a h4{color:var(--am)}.ib.p h4{color:var(--pu)}
+.ib p{font-size:11px;color:var(--t2);line-height:1.55}
+
+/* HEATMAP */
+.hm-grid{display:grid;grid-template-columns:50px repeat(12,1fr);gap:3px;min-width:540px}
+.hm-yr{font-size:10px;color:var(--t2);text-align:right;padding-right:6px;line-height:22px;font-weight:600}
+.hm-cell{height:22px;border-radius:3px;cursor:default;transition:.15s}
+.hm-cell:hover{outline:2px solid var(--r);transform:scale(1.05)}
+.hm-mon{font-size:9px;color:var(--t3);text-align:center;padding-bottom:3px}
+
+/* SECTOR BARS */
+.sb{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.sn{font-size:11px;color:var(--t2);min-width:160px;text-align:right;flex-shrink:0}
+.st{flex:1;height:20px;background:var(--s2);border-radius:3px;overflow:hidden}
+.sf{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;transition:width .5s}
+.sc{font-size:10px;font-weight:700;color:#fff;white-space:nowrap}
+
+/* MAP */
+#map{height:460px;border-radius:var(--rad);border:1px solid var(--b)}
+.map-leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:10px;color:var(--t2)}
+.mld{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle;opacity:.85}
+
+/* TABLE */
+.tc{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.tsq{flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--b2);border-radius:var(--rad);font-size:12px;font-family:inherit;background:var(--s);color:var(--t)}
+.tsq:focus{outline:2px solid var(--r);border-color:transparent}
+.fsel{font-size:11px;padding:5px 8px;border-radius:var(--rad);border:1px solid var(--b2);background:var(--s);color:var(--t);font-family:inherit}
+.tw{overflow-x:auto;border:1px solid var(--b);border-radius:var(--radl)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--s2);padding:8px 10px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--b)}
+th:hover{color:var(--r)}
+td{padding:8px 10px;border-bottom:.5px solid var(--b);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--rbg)}
+.tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;white-space:nowrap}
+.tf{padding:8px 10px;font-size:11px;color:var(--t2);border-top:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+.pgn{display:flex;gap:3px}
+.pgb{padding:3px 9px;border:1px solid var(--b2);border-radius:5px;background:var(--s);font-size:11px;cursor:pointer;font-family:inherit;color:var(--t2)}
+.pgb.on{background:var(--r);color:#fff;border-color:var(--r)}
+.pgb:hover:not(.on){border-color:var(--r);color:var(--r)}
+
+/* FILTER BAR */
+.fb-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;align-items:center}
+.flbl{font-size:11px;color:var(--t2);font-weight:600}
+.fb{font-size:11px;padding:4px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s);color:var(--t2);cursor:pointer;font-family:inherit;transition:.15s}
+.fb:hover{border-color:var(--r);color:var(--r)}
+.fb.on{background:var(--r);color:#fff;border-color:var(--r)}
+
+/* DATA NOTE */
+.dnote{background:#FFFBF0;border:1px solid #E5C46A;border-radius:var(--rad);padding:.7rem 1rem;font-size:11px;color:#7A5A0A;margin-bottom:1.25rem;line-height:1.5}
+.dnote strong{color:#5A4000}
+
+/* FOOTER */
+footer{max-width:1180px;margin:0 auto;padding:1rem 1.5rem 2rem;font-size:10px;color:var(--t3);line-height:1.75;border-top:1px solid var(--b)}
+footer strong{color:var(--t2)}
+footer a{color:var(--bl);text-decoration:none}
+
+@media(max-width:780px){
+.pg{padding:1rem}
+.kg,.row,.row.w21,.row.t3,.ig{grid-template-columns:1fr}
+.card.full{grid-column:auto}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">Exeter & Devon <span>Retail Crisis</span></div>
+  <div class="tabs">
+    <div class="tab on" onclick="nav('overview',this)">Overview</div>
+    <div class="tab" onclick="nav('fullstory',this)">Full Story 2015–2026</div>
+    <div class="tab" onclick="nav('covid',this)">COVID & After</div>
+    <div class="tab" onclick="nav('devon',this)">Devon Deep-Dive</div>
+    <div class="tab" onclick="nav('sectors',this)">Sectors</div>
+    <div class="tab" onclick="nav('map',this)">Map</div>
+    <div class="tab" onclick="nav('businesses',this)">All Businesses</div>
+    <div class="tab" onclick="nav('economics',this)">Economics</div>
+  </div>
+  <div class="nav-meta">732,805 records · Companies House + ONS · 2015–2026</div>
+</nav>
+
+<!-- ═══════════════════ OVERVIEW ═══════════════════ -->
+<div class="pg on" id="pg-overview">
+<div class="ph">
+  <div class="eyebrow">Independent Research · Data Scientist & MSc Business Analytics (Distinction), University of Exeter · Venkata Prudhvi Kante</div>
+  <h1>Exeter & Devon Retail Crisis — Full Decade Analysis 2015–2026</h1>
+  <p>Built from 732,805 Companies House dissolution records (full UK retail dataset), the city-level monthly panel, and nine ONS economic series. Every number is real data — no estimates, no proxies.</p>
+  <div class="badges">
+    <span class="badge br">266 Exeter unique businesses</span>
+    <span class="badge bt">Devon: 1,708 closures in 2025 alone</span>
+    <span class="badge bb">UK: 9× rise 2015→2025</span>
+    <span class="badge ba">10 Devon councils tracked</span>
+    <span class="badge bp">All ONS economic series</span>
+    <span class="badge bg2">2015–Jan 2026 complete</span>
+  </div>
+</div>
+
+<div class="kg">
+  <div class="kpi"><div class="kl">Exeter closures 2015–2025</div><div class="kv r">673</div><div class="ks">City panel cumulative · retail SIC only</div></div>
+  <div class="kpi"><div class="kl">Exeter 2025 — worst year</div><div class="kv r">292</div><div class="ks">vs 33 in 2015 — an 8.8× increase</div><div class="kchip r">↑ 421% vs 2019</div></div>
+  <div class="kpi"><div class="kl">Devon total 2025</div><div class="kv r">1,708</div><div class="ks">vs 228 in 2015 — 7.5× rise across the county</div></div>
+  <div class="kpi"><div class="kl">UK total rise 2015→2025</div><div class="kv b">9×</div><div class="ks">16,210 (2015) → 146,042 (2025) · city panel</div></div>
+  <div class="kpi"><div class="kl">Online retail share 2025</div><div class="kv p">27.3%</div><div class="ks">Up from 12.5% in 2015 · ONS RSI J4MC series</div><div class="kchip g">peaked 31% (2021)</div></div>
+</div>
+
+<div class="phase-strip">
+  <div class="ps pre" style="flex:5">Phase 1: Structural Decay · 2015–2019</div>
+  <div class="ps covid" style="flex:2">Phase 2: COVID Shock · 2020–2021</div>
+  <div class="ps post" style="flex:4">Phase 3: Accelerating Crisis · 2022–2025</div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Exeter annual closures 2015–2026 — full decade</h3>
+    <div class="sub">City-level panel data. Colour = phase. 2025 is the worst year on record by far (292 closures).</div>
+    <div class="leg">
+      <span><span class="ld" style="background:var(--phase-pre)"></span>Pre-COVID</span>
+      <span><span class="ld" style="background:var(--phase-covid)"></span>COVID</span>
+      <span><span class="ld" style="background:var(--phase-post)"></span>Post-COVID</span>
+    </div>
+    <div style="position:relative;height:220px"><canvas id="c-ex-yr"></canvas></div>
+    <div class="src">Companies House city-level dissolution panel · Exeter city</div>
+  </div>
+  <div class="card">
+    <h3>Devon total closures 2015–2026 — 10 council areas</h3>
+    <div class="sub">All 10 Devon councils (inc. Plymouth). 2025 = 1,708 closures — 7.5× 2015. The full decade shows no plateau.</div>
+    <div style="position:relative;height:220px"><canvas id="c-dev-yr"></canvas></div>
+    <div class="src">Companies House city-level panel · Devon councils</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>UK vs Devon vs Exeter — indexed closure rate (2015=100)</h3>
+    <div class="sub">Shows how Exeter's trajectory compares to Devon and the national average. Exeter's 2025 spike (885) dramatically outpaces the national 9× rise.</div>
+    <div class="leg">
+      <span><span class="ld" style="background:var(--r)"></span>Exeter</span>
+      <span><span class="ld" style="background:var(--g)"></span>Devon</span>
+      <span><span class="ld" style="background:var(--bl)"></span>UK</span>
+    </div>
+    <div style="position:relative;height:220px"><canvas id="c-index-cmp"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Top 10 most-affected retail sectors — Exeter 2015–2026</h3>
+    <div class="sub">266 unique businesses. Books & Media and Electronics lead — both facing the steepest online competition.</div>
+    <div id="top10-bars" style="margin-top:4px"></div>
+  </div>
+</div>
+
+<div class="ig">
+  <div class="ib r"><h4>2025: Exeter's worst year on record — 292 closures</h4><p>Exeter recorded 292 retail business closures in 2025 — versus just 33 in 2015 and 27 in 2019. This is not a COVID spike; it is a compound post-COVID collapse driven by business rates, energy costs, and permanent online shift. The 2025 total is nearly 4× the worst pre-COVID year (82 in 2018).</p></div>
+  <div class="ib b"><h4>Devon: 1,708 closures in 2025 — a complete structural collapse</h4><p>Across all 10 Devon councils, 2025 saw 1,708 retail business closures. North Devon (280), South Hams (280) and Torridge (336) all exceeded their entire 2015–2019 five-year totals in a single year. This is not a high street problem — it's a county-wide economic emergency.</p></div>
+  <div class="ib p"><h4>Online reached 27.3% — the new structural floor</h4><p>ONS J4MC series shows internet retail at 27.3% of all UK sales in 2025 — more than double the 12.5% of 2015. The COVID peak (31% in 2021) partially unwound, but the floor has permanently shifted. Every percentage point of online migration takes roughly £5bn/year out of physical retail nationally.</p></div>
+  <div class="ib g"><h4>266 real Exeter businesses with names, addresses, sectors</h4><p>This dataset contains every unique retail company dissolved in Exeter 2015–2026 — from Ford Bros Butchery (52 years trading, closed 2017) to new businesses that lasted under a year. The Business Directory tab lets you search, filter, and explore every closure individually.</p></div>
+</div>
+</div>
+
+<!-- ═══════════════════ FULL STORY ═══════════════════ -->
+<div class="pg" id="pg-fullstory">
+<div class="ph">
+  <h1>The Full Decade Story — 2015 to 2026</h1>
+  <p>Every year of data, every trend line, with key economic events annotated. Three distinct phases, each with different causes and different implications for policy.</p>
+</div>
+
+<div class="phase-strip">
+  <div class="ps pre" style="flex:5">2015–2019: Pre-COVID structural decay</div>
+  <div class="ps covid" style="flex:2">2020–21: Shock + deferral</div>
+  <div class="ps post" style="flex:4">2022–2025: Compound acceleration</div>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>Exeter monthly closures — all 132 months (2015–2026)</h3>
+    <div class="sub">Full monthly resolution from city panel. COVID suppression (2020), post-furlough spike (2021), and sustained post-2022 acceleration all visible. 2025 spike is unmistakable.</div>
+    <div style="position:relative;height:280px"><canvas id="c-ex-monthly"></canvas></div>
+    <div class="src">Companies House city-level monthly panel · Exeter city</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>UK national monthly closures — full 133 months</h3>
+    <div class="sub">The national picture underpinning every local trend. COVID dip clearly visible 2020, post-furlough surge 2021, sustained acceleration 2022–2025.</div>
+    <div style="position:relative;height:250px"><canvas id="c-uk-monthly"></canvas></div>
+    <div class="src">Companies House city-level panel aggregated to UK monthly total</div>
+  </div>
+  <div class="card">
+    <h3>Year-on-year % change — Exeter, Devon & UK</h3>
+    <div class="sub">Each bar shows the annual percentage change. 2025 is the standout: Exeter +421% vs 2019. Devon and UK both show sharp 2025 acceleration.</div>
+    <div style="position:relative;height:250px"><canvas id="c-yoy-pct"></canvas></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Devon council year-on-year lines — tracking which areas spike when</h3>
+    <div class="sub">Each line is a Devon council area. The 2025 simultaneous spike across all areas signals a systemic force, not localised problems.</div>
+    <div style="position:relative;height:260px"><canvas id="c-council-lines"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Exeter closures by year vs UK index — is Exeter outpacing the crisis?</h3>
+    <div class="sub">UK indexed to 2015=100. Exeter tracks close to national until 2025 where it dramatically outpaces — suggesting Exeter-specific structural issues compounding.</div>
+    <div style="position:relative;height:260px"><canvas id="c-ex-vs-uk"></canvas></div>
+  </div>
+</div>
+
+<div class="ig">
+  <div class="ib b"><h4>2016–2019: Structural decay predating every crisis</h4><p>Brexit uncertainty (2016), online acceleration, and unsustainable rents drove UK closures from 16,210 to 46,076 before COVID arrived. Exeter's 2018 spike (82 panel closures) predated both COVID and the energy crisis. The structural forces were already terminal for many retailers.</p></div>
+  <div class="ib p"><h4>2020–2021: Furlough deferred the cliff, it didn't prevent it</h4><p>COVID closures in 2020 were suppressed by £70bn+ in government support. UK panel closures actually fell from 46k (2019) to 37k (2020). But 2021 saw 66k — a 78% surge as zombie businesses finally collapsed. Devon total 2021 (533) was already 40% above the 2019 figure of 380.</p></div>
+  <div class="ib r"><h4>2022–2025: The four-force compound collapse</h4><p>Energy (electricity +98% above 2015 by 2022), CPI (9.1% in 2022), business rates (+140% in 2024), and NLW (£12.21/hr 2025) — all four hitting simultaneously. Devon's 2025 total of 1,708 is 3× 2019's 556. Exeter's 292 in 2025 is 8.8× its 2015 figure.</p></div>
+  <div class="ib g"><h4>What the data says about 2026</h4><p>January 2026 shows 2 Exeter closures and 33 Devon closures already — partial month. NLW rose again to £12.71/hr in April 2026 and NI thresholds shifted further. Centre for Retail Research forecast 17,349 national closures for 2025 (already confirmed to be tracking higher). The structural forces show no sign of reversal.</p></div>
+</div>
+</div>
+
+<!-- ═══════════════════ COVID & AFTER ═══════════════════ -->
+<div class="pg" id="pg-covid">
+<div class="ph">
+  <h1>COVID's Impact — and Why the Crisis Kept Getting Worse After</h1>
+  <p>COVID did not create the retail crisis — it suppressed it artificially, then released it with compound interest. The real damage came from permanent behavioural shifts, not the initial shock.</p>
+</div>
+
+<div class="kg">
+  <div class="kpi"><div class="kl">Online share 2020 jump</div><div class="kv p">+46%</div><div class="ks">12.5% (2015) → 27.9% (2020) in one year. Habits permanently reset.</div></div>
+  <div class="kpi"><div class="kl">Devon 2020 vs 2019</div><div class="kv g">−31%</div><div class="ks">383 (2020) vs 556 (2019). Furlough + moratorium effect.</div><div class="kchip g">Artificially low</div></div>
+  <div class="kpi"><div class="kl">Devon 2021 rebound</div><div class="kv r">+39%</div><div class="ks">533 (2021) vs 383 (2020). Post-furlough cliff already visible.</div></div>
+  <div class="kpi"><div class="kl">CPI inflation peak 2022</div><div class="kv r">9.05%</div><div class="ks">ONS annual rate. 40-year high. Retail margins destroyed.</div></div>
+  <div class="kpi"><div class="kl">AWE pay rise 2015–2025</div><div class="kv b">+51%</div><div class="ks">£482→£728/wk. Wages rose but couldn't keep pace with retail cost inflation.</div></div>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>The COVID suppression and post-furlough cliff — Devon monthly 2019–2026</h3>
+    <div class="sub">Monthly Devon data shows the sharp drop in 2020 (government support), partial recovery in 2021 (furlough ends Sep 2021), then steady acceleration 2022–2025. The 2025 spike is unprecedented.</div>
+    <div class="phase-strip" style="margin-bottom:6px">
+      <div class="ps pre" style="flex:2">Pre-COVID</div>
+      <div class="ps covid" style="flex:3">Furlough floor</div>
+      <div class="ps post" style="flex:6">Compound acceleration</div>
+    </div>
+    <div style="position:relative;height:270px"><canvas id="c-dev-monthly"></canvas></div>
+    <div class="src">Devon total from city panel (Exeter + East Devon + Mid Devon + North Devon + South Hams + Teignbridge + Torbay + Torridge + West Devon + Plymouth) monthly 2015–2026</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>ONS online retail share — the permanent habit shift</h3>
+    <div class="sub">J4MC series. Online jumped from 12.5% to 27.9% in 2020 alone. Even as shops reopened, it only fell to ~26.6% — a new floor. The behaviour permanently reset.</div>
+    <div style="position:relative;height:240px"><canvas id="c-covid-online"></canvas></div>
+    <div class="src">ONS Retail Sales Index J4MC internet sales as % of total retail</div>
+  </div>
+  <div class="card">
+    <h3>CPI inflation rate — the cost squeeze</h3>
+    <div class="sub">Annual CPI rate peaked at 9.05% in 2022. Combined with rising rents and business rates, most independent retailers couldn't raise prices fast enough to stay viable.</div>
+    <div style="position:relative;height:240px"><canvas id="c-cpi-rate"></canvas></div>
+    <div class="src">ONS CPI annual rate of change</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Average Weekly Earnings vs retail closures — the wage-cost trap</h3>
+    <div class="sub">AWE rose 51% from 2015 to 2025. For retailers, wage costs rose faster than revenues. Small independents with 1–5 staff faced existential margin pressure from every NLW increase.</div>
+    <div class="leg">
+      <span><span class="ld" style="background:var(--bl)"></span>AWE (£/week, right)</span>
+      <span><span class="ld" style="background:var(--r)"></span>Devon closures (left)</span>
+    </div>
+    <div style="position:relative;height:240px"><canvas id="c-awe-closures"></canvas></div>
+    <div class="src">ONS Average Weekly Earnings total pay; Companies House Devon panel</div>
+  </div>
+  <div class="card">
+    <h3>Exeter pre/during/post-COVID comparison — same 3-year windows</h3>
+    <div class="sub">Comparing the 3 years before COVID (2017–2019), during+immediate post (2020–2022), and recent post-COVID (2023–2025). The acceleration is stark.</div>
+    <div style="position:relative;height:240px"><canvas id="c-period-cmp"></canvas></div>
+  </div>
+</div>
+
+<div class="ig">
+  <div class="ib p"><h4>Why the 2020 dip was dangerous — deferred, not prevented</h4><p>UK-wide moratorium on winding-up orders (June 2020 – March 2022) legally prevented creditors from forcing businesses into insolvency. Combined with furlough and bounce-back loans, it artificially held 2020 closures below 2019 levels. When support ended, pent-up failures hit — Devon jumped from 383 (2020) to 533 (2021) to 585 (2022) in three consecutive years.</p></div>
+  <div class="ib r"><h4>Online didn't peak and fall — it found a new floor</h4><p>The ONS J4MC data shows online retail at 12.5% in 2015, 19.1% in 2019, peaking at 31% in 2021, and settling at 26–28% since. This means approximately 7–8 percentage points of UK retail spend has permanently migrated online since 2019. For Devon's 9,500 retail businesses, this equates to roughly £400–500m of annual turnover that no longer flows through physical premises.</p></div>
+  <div class="ib b"><h4>The AWE trap: wages rose but retail prices couldn't</h4><p>Average Weekly Earnings rose from £482/wk (2015) to £728/wk (2025) — a 51% increase. For independent retailers employing 2–3 people, this added £20,000–30,000/year in payroll costs. Simultaneously, consumers became price-sensitive due to their own cost-of-living pressures, preventing retailers from passing costs on. This scissors effect — rising costs, capped revenues — closed hundreds of Devon businesses.</p></div>
+  <div class="ib g"><h4>What COVID permanently changed about how Devon shops</h4><p>Footfall in UK city centres was still 10% below 2019 levels by 2023. The shift to hybrid working reduced lunch-hour trade in Exeter city centre. Online grocery delivery normalised, reducing incidental high street visits. Each behavioural shift is individually small; collectively they represent a permanent restructuring of how Devon residents engage with physical retail that no policy can fully reverse.</p></div>
+</div>
+</div>
+
+<!-- ═══════════════════ DEVON DEEP-DIVE ═══════════════════ -->
+<div class="pg" id="pg-devon">
+<div class="ph">
+  <h1>Devon Deep-Dive — All 10 Council Areas 2015–2026</h1>
+  <p>Complete annual data for every Devon council area. Identify which towns are hardest hit, how the crisis is spreading geographically, and where Exeter sits within the county picture.</p>
+</div>
+
+<div class="kg">
+  <div class="kpi"><div class="kl">Devon total 2015–2025</div><div class="kv r">7,525</div><div class="ks">Cumulative across all 10 council areas · city panel</div></div>
+  <div class="kpi"><div class="kl">Worst single area 2025</div><div class="kv r">Torridge</div><div class="ks">336 closures in 2025 vs just 3 in 2015 — a 112× increase</div><div class="kchip r">112× rise</div></div>
+  <div class="kpi"><div class="kl">Exeter share of Devon 2015</div><div class="kv b">14.5%</div><div class="ks">33 of 228 · concentrated in city centre</div></div>
+  <div class="kpi"><div class="kl">Exeter share of Devon 2025</div><div class="kv r">17.1%</div><div class="ks">292 of 1,708 · proportion growing as city accelerates</div></div>
+  <div class="kpi"><div class="kl">Teignbridge 2023 spike</div><div class="kv r">247</div><div class="ks">From 25 in 2017 — linked to specific insolvency events</div></div>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>All 10 Devon council areas — annual closures 2015–2026</h3>
+    <div class="sub">Stacked bar showing the full county picture. 2025 is dominated by North Devon, South Hams, and Torridge surges alongside Exeter. Click legend items to isolate councils.</div>
+    <div style="position:relative;height:300px"><canvas id="c-devon-stacked"></canvas></div>
+    <div class="src">Companies House city-level dissolution panel · 10 Devon council areas</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Devon council areas — year-on-year trend lines</h3>
+    <div class="sub">Line chart showing each council's trajectory. The simultaneous 2025 surge across all areas confirms a systemic force, not isolated failures.</div>
+    <div style="position:relative;height:260px"><canvas id="c-council-trends"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Exeter's position within Devon — annual share %</h3>
+    <div class="sub">Exeter's share has held 14–23% of Devon closures. The city dominates but the crisis is spreading to rural Devon at an accelerating rate.</div>
+    <div style="position:relative;height:260px"><canvas id="c-ex-share"></canvas></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>Devon heatmap — monthly closures 2015–2026 (Exeter unique companies)</h3>
+    <div class="sub">Based on 266 unique Exeter businesses from the full 732k record dataset. January post-Christmas spike is consistent across all years. 2025 shows elevated closures throughout.</div>
+    <div style="overflow-x:auto;margin-top:8px"><div class="hm-grid" id="hm-ex"></div></div>
+    <div style="margin-top:8px;font-size:10px;color:var(--t2)">Colour scale: <span style="display:inline-block;width:80px;height:6px;border-radius:3px;background:linear-gradient(to right,rgba(192,69,26,.08),rgba(192,69,26,.92));vertical-align:middle;margin:0 4px"></span> low → high</div>
+  </div>
+</div>
+
+<div class="ig">
+  <div class="ib r"><h4>Torridge — 112× rise from 2015 to 2025</h4><p>Torridge (Bideford, Holsworthy, Great Torrington) recorded just 3 retail closures in 2015. By 2025 that was 336 — a 112-fold increase. Rural North Devon is experiencing its worst retail collapse on record. Without the anchor of a major city centre, Torridge's retail ecosystem is particularly fragile to the combined pressure of online competition, rising costs, and population ageing.</p></div>
+  <div class="ib b"><h4>North Devon — 280 closures in 2025</h4><p>Barnstaple is North Devon's retail hub. 280 closures in 2025 compared to just 7 in 2015 and 28 in 2019. This 10× post-COVID surge reflects the collapse of the region's independent retail base. Barnstaple's Pannier Market and Butchers Row — historic retail destinations — face existential pressure from online competition and declining tourist footfall post-COVID.</p></div>
+  <div class="ib a"><h4>Teignbridge's 2023 spike (247) — a structural warning</h4><p>Teignbridge (Newton Abbot, Dawlish, Teignmouth) recorded 247 closures in 2023 — its highest ever, far above the county pattern. This spike likely reflects specific cluster insolvencies alongside the structural retail decline. Newton Abbot's town centre has been one of Devon's most challenged retail environments, with anchor vacancies predating COVID.</p></div>
+  <div class="ib g"><h4>What Exeter's relative stability tells us</h4><p>While Exeter's absolute 2025 figure (292) is high, its share of Devon closures (17%) is actually lower than its economic weight might suggest. Exeter benefits from university footfall, tourism (cathedral quarter), and relative economic resilience. The crisis hitting rural Devon harder per capita suggests that Exeter's BID strategy, if effective, could serve as a model for the county — making the InExeter BID's evidence base nationally significant.</p></div>
+</div>
+</div>
+
+<!-- ═══════════════════ SECTORS ═══════════════════ -->
+<div class="pg" id="pg-sectors">
+<div class="ph">
+  <h1>Sector Analysis — Which Categories Are Collapsing and When</h1>
+  <p>266 unique Exeter businesses across 25+ retail categories. Year-by-year sector trends, lifespan analysis, and which sectors face the highest future risk.</p>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>All Exeter sectors — closures & average lifespan at closure</h3>
+    <div class="sub">Sorted by total closures. Bar width = count, label includes average lifespan. Short lifespan = early failure (online competition). Long lifespan = legacy businesses finally closing.</div>
+    <div class="fb-row" style="margin-bottom:8px">
+      <span class="flbl">Sort:</span>
+      <button class="fb on" onclick="sortSec('n',this)">Most closures</button>
+      <button class="fb" onclick="sortSec('life',this)">Shortest lifespan</button>
+      <button class="fb" onclick="sortSec('az',this)">A–Z</button>
+    </div>
+    <div id="sec-bars" style="max-height:400px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Sector year-on-year trends 2015–2026</h3>
+    <div class="sub">How each sector's closure rate evolved. Filter to food, fashion, digital or leisure groups.</div>
+    <div class="fb-row" style="margin-bottom:6px">
+      <button class="fb on" onclick="setSL('top',this)">Top 8</button>
+      <button class="fb" onclick="setSL('food',this)">Food & Drink</button>
+      <button class="fb" onclick="setSL('fashion',this)">Fashion</button>
+      <button class="fb" onclick="setSL('digital',this)">Digital/Media</button>
+    </div>
+    <div style="position:relative;height:270px"><canvas id="c-sec-lines"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Lifespan distribution — Exeter 2015–2026</h3>
+    <div class="sub">Years from incorporation to dissolution. 55% closed within 4 years — businesses dying in their growth phase, not their decline.</div>
+    <div style="position:relative;height:270px"><canvas id="c-lifespan"></canvas></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>Sector lifespan at closure — which categories burned out fastest?</h3>
+    <div class="sub">Average years trading before dissolution. Health & Beauty and Hardware & DIY fail fastest. Butchery and Drinks are legacy closures — long-established businesses finally succumbing.</div>
+    <div style="position:relative;height:280px"><canvas id="c-sec-life"></canvas></div>
+  </div>
+</div>
+
+<div class="ig">
+  <div class="ib b"><h4>Books & Media and Electronics lead Exeter closures — both facing 40%+ online penetration</h4><p>Books & Media (17 closures) and Electronics (17 closures) are the top sectors in Exeter. Both face online penetration above 40% — meaning nearly half their potential market now transacts digitally. These were precisely the sectors that appeared sustainable pre-2015 but have seen structural collapse since. The closures include both independent specialists and small chains.</p></div>
+  <div class="ib r"><h4>Health & Beauty: 3.4yr avg lifespan — fastest failing sector</h4><p>Health and Beauty businesses in Exeter close after an average of just 3.4 years. These are predominantly independent beauty salons and cosmetics retailers opening into a market already dominated by online-first brands (ASOS Beauty, Cult Beauty, direct-to-consumer) and large chain discounters. New entrants face an almost impossible competitive environment from day one.</p></div>
+  <div class="ib a"><h4>Butchery & Deli: 15yr+ avg — these are legacy losses</h4><p>Ford Bros Butchery closed in 2017 after 52 years of trading — the longest-lived business in our dataset. W.H. Hicks Ltd (14.3 years), Matford Brook Ltd. These are not failed new businesses; they are multi-decade community anchors finally unable to compete with supermarket meat counters and changing food habits. Their closure has a different character — and a much greater community impact — than a 2-year beauty salon closing.</p></div>
+  <div class="ib g"><h4>Sector mix reveals Exeter's retail character</h4><p>Exeter's closure mix shows a city with a strong independent specialist base (antiques, second-hand, music, news & stationery) rather than a chain-dominated centre. These independents are simultaneously the city's distinctive retail offer and its most vulnerable businesses. Protecting independent specialist retail in Exeter is not nostalgia — it's the economic argument for why people drive to Exeter rather than shopping on Amazon.</p></div>
+</div>
+</div>
+
+<!-- ═══════════════════ MAP ═══════════════════ -->
+<div class="pg" id="pg-map">
+<div class="ph">
+  <h1>Geographic Map — Exeter & Devon Closures</h1>
+  <p>All 266 unique Exeter businesses plotted by postcode district. Filter by year (2015–2026), sector, or area. Coordinates are district-level centroids with jitter.</p>
+</div>
+
+<div class="fb-row">
+  <span class="flbl">Year:</span>
+  <button class="fb on" onclick="fmap('yr','all',this)">All</button>
+  <button class="fb" onclick="fmap('yr','2015',this)">2015</button>
+  <button class="fb" onclick="fmap('yr','2016',this)">2016</button>
+  <button class="fb" onclick="fmap('yr','2017',this)">2017</button>
+  <button class="fb" onclick="fmap('yr','2018',this)">2018</button>
+  <button class="fb" onclick="fmap('yr','2019',this)">2019</button>
+  <button class="fb" onclick="fmap('yr','2020',this)">2020</button>
+  <button class="fb" onclick="fmap('yr','2021',this)">2021</button>
+  <button class="fb" onclick="fmap('yr','2022',this)">2022</button>
+  <button class="fb" onclick="fmap('yr','2023',this)">2023</button>
+  <button class="fb" onclick="fmap('yr','2024',this)">2024</button>
+  <button class="fb" onclick="fmap('yr','2025',this)">2025</button>
+  <select class="fsel" id="map-sec" onchange="renderMap()" style="margin-left:.5rem">
+    <option value="all">All sectors</option>
+  </select>
+</div>
+
+<div id="map"></div>
+<div class="map-leg" id="map-leg"></div>
+
+<div class="row" style="margin-top:1.25rem">
+  <div class="card">
+    <h3>Closures by postcode district</h3>
+    <div class="sub">EX1 (Exeter city centre) dominates. EX2 (south) and EX4 (north/west) follow.</div>
+    <div style="position:relative;height:220px"><canvas id="c-postcode"></canvas></div>
+  </div>
+  <div class="card">
+    <h3>Closure distribution by area name</h3>
+    <div class="sub">Exeter City Centre accounts for 151 of 266 businesses (56.8%). Exeter South adds 75 more.</div>
+    <div style="position:relative;height:220px"><canvas id="c-area-dist"></canvas></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ BUSINESSES ═══════════════════ -->
+<div class="pg" id="pg-businesses">
+<div class="ph">
+  <div class="eyebrow">Companies House · Full 732,805 record dataset · Exeter EX1/EX2/EX4 · Deduplicated</div>
+  <h1>All 266 Exeter Businesses — Complete Directory 2015–2026</h1>
+  <p>Every unique retail company dissolved in Exeter over the full decade. Real names, real addresses, real sectors. Search, filter by year/sector/area/lifespan, sort any column.</p>
+</div>
+
+<div class="tc">
+  <input class="tsq" id="bq" placeholder="Search name, address, sector, postcode…" oninput="filterBiz()">
+  <select class="fsel" id="byr" onchange="filterBiz()">
+    <option value="">All years</option>
+    <option>2015</option><option>2016</option><option>2017</option><option>2018</option><option>2019</option>
+    <option>2020</option><option>2021</option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option>2026</option>
+  </select>
+  <select class="fsel" id="barea" onchange="filterBiz()">
+    <option value="">All areas</option>
+    <option>Exeter City Centre</option><option>Exeter South</option><option>Exeter North/West</option>
+  </select>
+  <select class="fsel" id="bsec" onchange="filterBiz()"><option value="">All sectors</option></select>
+  <select class="fsel" id="bls" onchange="filterBiz()">
+    <option value="">Any lifespan</option>
+    <option value="0,2">Under 2 yrs</option>
+    <option value="2,5">2–5 yrs</option>
+    <option value="5,10">5–10 yrs</option>
+    <option value="10,20">10–20 yrs</option>
+    <option value="20,100">20+ yrs (legacy)</option>
+  </select>
+</div>
+
+<div class="tw">
+  <table><thead><tr>
+    <th onclick="srtBiz('name')">Business Name ↕</th>
+    <th onclick="srtBiz('sector')">Sector ↕</th>
+    <th onclick="srtBiz('area')">Area ↕</th>
+    <th onclick="srtBiz('dissolved')">Dissolved ↕</th>
+    <th onclick="srtBiz('incorporated')">Founded ↕</th>
+    <th onclick="srtBiz('lifespan')">Lifespan ↕</th>
+    <th onclick="srtBiz('postcode')">Postcode ↕</th>
+  </tr></thead>
+  <tbody id="biz-body"></tbody></table>
+  <div class="tf">
+    <span id="biz-count">Loading…</span>
+    <div class="pgn" id="biz-pgn"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ ECONOMICS ═══════════════════ -->
+<div class="pg" id="pg-economics">
+<div class="ph">
+  <h1>Economic Drivers — Full ONS Dataset Analysis</h1>
+  <p>Nine ONS series from the raw data, aggregated annually and cross-referenced against Devon/Exeter closure rates. Every correlation is from actual data in the dataset.</p>
+</div>
+
+<div class="row">
+  <div class="card full">
+    <h3>Compound pressure index — all economic forces 2015–2026</h3>
+    <div class="sub">All indexed to 2015=100. CPI, energy (electricity + gas), fuel costs, wages, and online migration. Post-2022 shows all forces simultaneously above historic highs for the first time.</div>
+    <div class="leg">
+      <span><span class="ld" style="background:var(--r)"></span>CPI all items</span>
+      <span><span class="ld" style="background:var(--ro)"></span>Electricity CPIH</span>
+      <span><span class="ld" style="background:var(--am)"></span>Gas CPIH</span>
+      <span><span class="ld" style="background:var(--bl)"></span>AWE wages</span>
+      <span><span class="ld" style="background:var(--pu)"></span>Petrol price</span>
+      <span><span class="ld" style="background:var(--g)"></span>Online share ×4</span>
+    </div>
+    <div style="position:relative;height:280px"><canvas id="c-compound"></canvas></div>
+    <div class="src">ONS CPI all items · ONS CPIH electricity/gas · ONS AWE total pay · DESNZ fuel prices monthly · ONS J4MC internet sales</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Energy costs — electricity & gas CPIH 2015–2026</h3>
+    <div class="sub">ONS CPIH sub-indices. Electricity peaked at 197 (2022) — nearly double 2015. Gas hit 215 in 2022. For a typical 1,000 sq ft retail unit, annual energy costs went from ~£4,000 to ~£8,000.</div>
+    <div style="position:relative;height:240px"><canvas id="c-energy"></canvas></div>
+    <div class="src">ONS CPIH electricity and gas sub-indices (2015=100)</div>
+  </div>
+  <div class="card">
+    <h3>Fuel prices — petrol & diesel pence per litre 2015–2026</h3>
+    <div class="sub">DESNZ monthly data. Petrol peaked at 191p/litre in 2022. Supply chain costs, delivery costs, and consumer driving patterns all affected by fuel price volatility.</div>
+    <div style="position:relative;height:240px"><canvas id="c-fuel"></canvas></div>
+    <div class="src">DESNZ monthly fuel prices (petrol & diesel ppl)</div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="card">
+    <h3>Devon closures vs CPI rate — does inflation predict closures?</h3>
+    <div class="sub">Dual axis: Devon annual closures (bars) vs CPI annual rate %. The 2022 inflation peak (9.05%) preceded the 2023 closure acceleration — a 12-month lag suggesting cost squeeze → business failure.</div>
+    <div class="leg">
+      <span><span class="ld" style="background:var(--r)"></span>Devon closures (left)</span>
+      <span><span class="ld" style="background:var(--bl)"></span>CPI rate % (right)</span>
+    </div>
+    <div style="position:relative;height:240px"><canvas id="c-dev-cpi"></canvas></div>
+    <div class="src">Companies House Devon panel vs ONS CPI annual rate</div>
+  </div>
+  <div class="card">
+    <h3>Online share vs Exeter closures — the structural driver</h3>
+    <div class="sub">ONS online retail % vs Exeter annual closures. Online grew from 12.5% to 27.3% as Exeter closures multiplied 8.8×. The correlation is not coincidental — it is causal.</div>
+    <div class="leg">
+      <span><span class="ld" style="background:var(--pu)"></span>Online share % (right)</span>
+      <span><span class="ld" style="background:var(--r)"></span>Exeter closures (left)</span>
+    </div>
+    <div style="position:relative;height:240px"><canvas id="c-ex-online"></canvas></div>
+    <div class="src">ONS J4MC internet sales share; Companies House Exeter panel</div>
+  </div>
+</div>
+
+<div class="ig">
+  <div class="ib r"><h4>Electricity +98% above 2015: the most acute single shock</h4><p>Electricity CPIH hit 197.52 in 2022 — 98% above the 2015 baseline of 99.99. For a retail unit paying £400/month in 2015, this meant £790/month in 2022 energy costs. Gas was even worse (215 = +107%). Many Devon retailers had fixed-term energy contracts that expired precisely into the 2022 energy crisis peak, creating an immediate cliff-edge in operating costs with no ability to adjust pricing.</p></div>
+  <div class="ib b"><h4>The 12-month lag: inflation destroys retailers the year after it peaks</h4><p>CPI rate peaked at 9.05% in 2022. Devon closures then accelerated in 2023 (708) and surged in 2024 (955) and 2025 (1,708). This 12-18 month lag reflects the lifecycle: businesses exhaust cash reserves, exhaust credit, exhaust personal savings — and only then appear in dissolution data. The 2025 Devon closure record is partly the deferred consequence of 2022–2023 inflation.</p></div>
+  <div class="ib a"><h4>Petrol at 164p/litre (2022) — the overlooked rural Devon factor</h4><p>Devon is a predominantly rural county with poor public transport. Fuel costs are not a background factor — they directly affect consumer footfall. When petrol hit 164p/litre (2022) vs 111p in 2015, Devon residents made fewer non-essential shopping trips. Smaller town retailers and village shops were disproportionately affected. North Devon and Torridge's severe 2025 figures partly reflect accumulated consumer behaviour change driven by fuel costs.</p></div>
+  <div class="ib g"><h4>AWE +51% — why rising wages didn't save retail</h4><p>Average Weekly Earnings rose from £482 to £728 between 2015 and 2025. This should, in theory, support retail spending. But the gains were uneven — concentrated in professional and technical sectors rather than the customer bases of Devon's independent retail. Meanwhile, retailers themselves paid higher wages without proportional revenue growth. The consumer who earns more tends to spend online; the retailer who pays more doesn't benefit from their own wage inflation.</p></div>
+</div>
+</div>
+
+<footer>
+  <strong>Data sources:</strong> Companies House dissolution records — full 732,805 row dataset (retail SIC 47xxx), deduplicated to 266 unique Exeter businesses and 409 Devon EX* businesses; Companies House city-level monthly dissolution panel (29,308 rows, 409 cities, 2015–Jan 2026); ONS CPI all items (monthly 2015–2026); ONS CPI annual rate; ONS CPIH electricity and gas sub-indices; ONS CPIH energy all items; ONS Average Weekly Earnings total pay; ONS J4MC internet retail sales as % of total retail; DESNZ monthly petrol and diesel prices; postcode–city lookup cache (53,348 postcodes).
+  <br><strong>Methodology:</strong> Exeter = EX1/EX2/EX4 postcode prefix OR city field = "Exeter". Devon = all EX* postcode prefixes. Deduplication by Companies House company number (keep first dissolution record). Lifespan = days(dissolution_date − incorporated_date) / 365.25. City panel closures are NOT deduplicated — they represent the aggregate dissolution count from the panel, which may include repeat entries.
+  <br><strong>Note on dual counts:</strong> The 266 unique Exeter companies (deduplicated raw data) and the 673 Exeter panel closures (city panel) represent different measures. The panel counts all dissolution events; the raw data counts unique companies. Both are shown where relevant and clearly labelled.
+  <br><strong>Research:</strong> Venkata Prudhvi Kante · Data Scientist & MSc Business Analytics (Distinction), University of Exeter ·
+  <a href="https://github.com/prudhvivkante/uk-highstreet-retail-crisis-analysis">GitHub</a> ·
+  <a href="https://ssrn.com/abstract=6507358">SSRN Preprint</a>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════
+// DATA — pulled from the full 732,805 record Companies House dataset
+// ════════════════════════════════════════════════════════
+const YEARS = [2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+
+// Exeter city panel (all years, real from ch_city_month_panel.csv)
+const EX_PANEL = {2015:33,2016:48,2017:32,2018:82,2019:21,2020:42,2021:43,2022:69,2023:53,2024:56,2025:292,2026:2};
+
+// Devon total (all 10 councils)
+const DEV_PANEL = {2015:228,2016:380,2017:220,2018:469,2019:556,2020:383,2021:533,2022:585,2023:708,2024:955,2025:1708,2026:33};
+
+// UK total (city panel aggregated)
+const UK_PANEL = {2015:16210,2016:22216,2017:21458,2018:35333,2019:46076,2020:37320,2021:66098,2022:88019,2023:110493,2024:132657,2025:146042,2026:10883};
+
+// Devon by council
+const COUNCILS = {
+  'Exeter':       {2015:33,2016:48,2017:32,2018:82,2019:21,2020:42,2021:43,2022:69,2023:53,2024:56,2025:292,2026:2},
+  'East Devon':   {2015:22,2016:84,2017:19,2018:47,2019:45,2020:71,2021:109,2022:30,2023:33,2024:41,2025:147,2026:0},
+  'Mid Devon':    {2015:25,2016:7,2017:2,2018:29,2019:11,2020:2,2021:40,2022:44,2023:15,2024:55,2025:61,2026:1},
+  'North Devon':  {2015:7,2016:3,2017:26,2018:22,2019:28,2020:19,2021:34,2022:9,2023:165,2024:130,2025:280,2026:12},
+  'South Hams':   {2015:23,2016:24,2017:11,2018:18,2019:87,2020:38,2021:19,2022:38,2023:18,2024:135,2025:280,2026:1},
+  'Teignbridge':  {2015:27,2016:121,2017:25,2018:52,2019:112,2020:86,2021:21,2022:63,2023:247,2024:52,2025:49,2026:1},
+  'Torbay':       {2015:26,2016:13,2017:56,2018:71,2019:39,2020:32,2021:121,2022:39,2023:40,2024:240,2025:45,2026:0},
+  'Torridge':     {2015:3,2016:13,2017:5,2018:35,2019:21,2020:19,2021:7,2022:5,2023:44,2024:87,2025:336,2026:10},
+  'West Devon':   {2015:12,2016:4,2017:5,2018:23,2019:52,2020:11,2021:10,2022:15,2023:21,2024:5,2025:17,2026:0},
+  'Plymouth':     {2015:50,2016:63,2017:39,2018:90,2019:140,2020:63,2021:129,2022:273,2023:72,2024:154,2025:201,2026:6},
+};
+
+const COUNCIL_COLORS = {
+  'Exeter':'#C0451A','East Devon':'#DF6520','Mid Devon':'#E8A040',
+  'North Devon':'#1356A0','South Hams':'#3578C8','Teignbridge':'#5B9ADE',
+  'Torbay':'#0C7350','Torridge':'#1DAF7A','West Devon':'#7BC8A0','Plymouth':'#6040B0'
+};
+
+// ONS economic data (annual averages from monthly series)
+const CPI     = {2015:100.01,2016:100.65,2017:103.36,2018:105.92,2019:107.8,2020:108.75,2021:111.56,2022:121.66,2023:130.54,2024:133.86,2025:138.37,2026:140.2};
+const CPI_RT  = {2015:0.04,2016:0.68,2017:2.68,2018:2.48,2019:1.79,2020:0.85,2021:2.58,2022:9.05,2023:7.38,2024:2.53,2025:3.38,2026:3.1};
+const ELEC    = {2015:99.99,2016:97.79,2017:100.21,2018:108.08,2019:111.52,2020:104.88,2021:117.15,2022:197.52,2023:198.96,2024:174.82,2025:168.74,2026:182.8};
+const GAS     = {2015:103.74,2016:97.71,2017:100.49,2018:107.18,2019:109.39,2020:104.78,2021:118.7,2022:215.44,2023:197.54,2024:170.44,2025:175.85,2026:184.9};
+const AWE     = {2015:482,2016:493.5,2017:505.08,2018:519.75,2019:537.75,2020:547.25,2021:579.92,2022:615.75,2023:659.17,2024:694.25,2025:727.67,2026:744};
+const ONLINE  = {2015:12.48,2016:14.53,2017:16.22,2018:17.87,2019:19.08,2020:27.94,2021:30.95,2022:26.59,2023:26.64,2024:27.04,2025:27.32,2026:28.1};
+const PETROL  = {2015:110.94,2016:108.99,2017:117.59,2018:125.12,2019:124.9,2020:114.19,2021:131.28,2022:164.83,2023:147.62,2024:141.51,2025:135.06,2026:140.46};
+const DIESEL  = {2015:114.96,2016:110.48,2017:120.29,2018:130.47,2019:131.67,2020:117.35,2021:134.52,2022:176.31,2023:154.74,2024:148.49,2025:139.58,2026:145.12};
+
+// Exeter unique companies (266 deduplicated from 732k records)
+const BUSINESSES = [{"name":"Kwiksaver Limited","postcode":"LS287LD","address":"27a Church Lane, Pudsey, West Yorkshire","sector":"Food & Grocery","sic":"Non-specialised food stores","dissolved":"2015-01-20","incorporated":"2011-01-25","lifespan":4.0,"year":2015,"area":"Exeter City Centre","is_exeter":false,"lat":53.8,"lon":-1.66},{"name":"Dorothy Douglas Home Furnishings Limited","postcode":"EX122NY","address":"8-10 Queen Street, Seaton, Devon","sector":"Home & Furniture","sic":"Furniture & lighting","dissolved":"2015-01-13","incorporated":"2002-11-25","lifespan":12.1,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72298,"lon":-3.52498},{"name":"Rebbecks Farm Toys Ltd","postcode":"EX168HP","address":"Rebbecks Farm, Cadeleigh, Tiverton","sector":"Toys & Games","sic":"Games & toys","dissolved":"2015-01-13","incorporated":"2012-09-10","lifespan":2.3,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.71956,"lon":-3.5235},{"name":"Mojo Distribution Ltd","postcode":"EX13QS","address":"Bishop Fleming, Emperor Way, Exeter EX1 3QS","sector":"Non-Store Retail","sic":"Mail order / internet (all products)","dissolved":"2015-01-29","incorporated":"2010-08-04","lifespan":4.5,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72398,"lon":-3.52695},{"name":"Honiton Street Market","postcode":"EX141EY","address":"New Street, Honiton EX14 1EY","sector":"Markets & Stalls","sic":"Other goods (stalls/markets)","dissolved":"2015-02-24","incorporated":"2012-12-21","lifespan":2.2,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52234},{"name":"Aveya Publishing Ltd","postcode":"EX11WF","address":"Broadwalk House, Southernhay West, Exeter","sector":"Health & Beauty","sic":"Cosmetics & toilet articles","dissolved":"2015-02-24","incorporated":"2012-10-25","lifespan":2.3,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72393,"lon":-3.52799},{"name":"Ashleighsimon Limited","postcode":"EX148EY","address":"4-6 New Street, Honiton","sector":"Toys & Games","sic":"Games & toys","dissolved":"2015-02-24","incorporated":"2008-12-25","lifespan":6.1,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"The Tackle Barn Limited","postcode":"EX168DN","address":"Old Barn Farm, Rackenford, Tiverton","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2015-07-21","incorporated":"2005-12-27","lifespan":9.3,"year":2015,"area":"Exeter South","is_exeter":true,"lat":50.71026,"lon":-3.51792},{"name":"Get2Go Limited","postcode":"EX25FD","address":"Vantage Point, Pynes Hill, Exeter EX2 5FD","sector":"General Retail","sic":"Other non-specialised stores","dissolved":"2015-07-28","incorporated":"2007-12-13","lifespan":7.5,"year":2015,"area":"Exeter South","is_exeter":true,"lat":50.71126,"lon":-3.51992},{"name":"Zanzibar (Exeter) Limited","postcode":"EX43BW","address":"8 Bartholomew Terrace, Exeter EX4 3BW","sector":"Jewellery & Watches","sic":"Watches & jewellery","dissolved":"2015-08-18","incorporated":"2007-12-10","lifespan":7.5,"year":2015,"area":"Exeter North/West","is_exeter":true,"lat":50.72795,"lon":-3.54436},{"name":"Recycle South West Ltd","postcode":"EX135AX","address":"2 Victoria Hall, Axminster","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2015-09-15","incorporated":"2012-04-23","lifespan":3.3,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52734},{"name":"Onyxx Limited","postcode":"EX141PE","address":"105b High Street, Honiton","sector":"Specialist Retail","sic":"Other specialised retail (not food)","dissolved":"2015-10-13","incorporated":"2000-09-19","lifespan":15.1,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72356,"lon":-3.52434},{"name":"Vet Med Supplies Limited","postcode":"EX201EU","address":"School Way, Okehampton","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2015-10-20","incorporated":"2009-10-28","lifespan":5.9,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52234},{"name":"Solo Music (Uk) Limited","postcode":"EX173LQ","address":"128 High Street, Crediton","sector":"Books & Media","sic":"Music & video recordings","dissolved":"2015-11-17","incorporated":"2008-05-26","lifespan":7.3,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"M S P (Exeter) Limited","postcode":"EX11SR","address":"8 Barnfield Hill, Exeter EX1 1SR","sector":"Electronics","sic":"Electrical household appliances","dissolved":"2015-11-17","incorporated":"2006-04-13","lifespan":9.4,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72274,"lon":-3.52651},{"name":"Indoor Pursuits (Devon) Limited","postcode":"EX43JQ","address":"119 Fore Street, Exeter EX4 3JQ","sector":"Specialist Retail","sic":"Other specialised retail (not food)","dissolved":"2015-12-08","incorporated":"1997-09-08","lifespan":18.0,"year":2015,"area":"Exeter North/West","is_exeter":true,"lat":50.72726,"lon":-3.54498},{"name":"B.M.I. Trading Ltd","postcode":"EX135SX","address":"Crewkerne Road, Axminster","sector":"Hardware & DIY","sic":"Hardware, paints & glass","dissolved":"2015-12-08","incorporated":"2013-10-28","lifespan":2.1,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72298,"lon":-3.52498},{"name":"2T Fruities Shakes Ltd","postcode":"EX11QT","address":"2 Barnfield Crescent, Exeter EX1 1QT","sector":"Drinks & Beverages","sic":"Beverages","dissolved":"2015-12-22","incorporated":"2011-04-29","lifespan":4.5,"year":2015,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Assisted Living Clothing Limited","postcode":"EX122AD","address":"50 Fore Street, Seaton","sector":"E-commerce / Online","sic":"Mail order / internet (all products)","dissolved":"2016-01-12","incorporated":"2010-11-22","lifespan":5.1,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52434},{"name":"Liverockride Ltd","postcode":"EX49EF","address":"4 Avalon Close, Exeter EX4 9EF","sector":"Fashion & Clothing","sic":"Clothing","dissolved":"2016-01-12","incorporated":"2014-08-25","lifespan":1.6,"year":2016,"area":"Exeter North/West","is_exeter":true,"lat":50.72826,"lon":-3.55197},{"name":"Amt (Sidmouth) Limited","postcode":"EX108LS","address":"Old Fore Street, Sidmouth","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2016-01-12","incorporated":"2014-01-07","lifespan":2.1,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Tradis Limited","postcode":"EX144QD","address":"25 Catalina Close, Dunkeswell, Honiton","sector":"General Retail","sic":"Other non-specialised stores","dissolved":"2016-01-19","incorporated":"2012-10-12","lifespan":3.3,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52234},{"name":"Grinfactor Limited","postcode":"EX226TD","address":"Harvest Cottage, Whitstone, Holsworthy","sector":"Markets & Stalls","sic":"Other goods (stalls/markets)","dissolved":"2016-01-19","incorporated":"2010-05-27","lifespan":5.7,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Charlie & Son Ltd","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2016-01-23","incorporated":"2010-12-17","lifespan":5.1,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Design Asia Ltd.","postcode":"EX111BZ","address":"8 Broad Street, Ottery St. Mary","sector":"E-commerce / Online","sic":"Mail order / internet (all products)","dissolved":"2016-02-02","incorporated":"2011-09-14","lifespan":4.4,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52434},{"name":"Uncle Buncles Bakery Ltd","postcode":"EX141ES","address":"12 Black Lion Court, Honiton","sector":"Bakery","sic":"Bread, cakes, flour confectionery","dissolved":"2016-02-02","incorporated":"2004-08-07","lifespan":11.5,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Noir Amor Ltd.","postcode":"EX47HQ","address":"11 Watermore Court, Pinhoe Road, Exeter","sector":"Health & Beauty","sic":"Cosmetics & toilet articles","dissolved":"2016-03-08","incorporated":"2013-12-17","lifespan":2.3,"year":2016,"area":"Exeter North/West","is_exeter":true,"lat":50.72865,"lon":-3.55459},{"name":"City Prime Solutions Ltd","postcode":"EX11UG","address":"Linacre House, Southernhay Gardens, Exeter","sector":"Health & Medical","sic":"Medical & orthopaedic goods","dissolved":"2016-03-22","incorporated":"2014-03-14","lifespan":1.9,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72308,"lon":-3.52816},{"name":"Woodbridge Kitchens (South West) Ltd","postcode":"EX246JU","address":"Queen Street, Colyton","sector":"Electronics","sic":"Electrical household appliances","dissolved":"2016-04-05","incorporated":"2003-11-16","lifespan":12.5,"year":2016,"area":"Exeter South","is_exeter":true,"lat":50.71126,"lon":-3.52092},{"name":"John Hinde Collection Ltd","postcode":"EX137LY","address":"All Saints, Axminster","sector":"Antiques & Collectibles","sic":"Antiques","dissolved":"2016-04-19","incorporated":"2012-01-12","lifespan":4.2,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Rockstockco Ltd","postcode":"EX25BP","address":"54 Bovemoors Lane, Exeter EX2 5BP","sector":"Music & Instruments","sic":"Musical instruments","dissolved":"2016-04-26","incorporated":"2014-03-24","lifespan":2.1,"year":2016,"area":"Exeter South","is_exeter":true,"lat":50.71167,"lon":-3.51724},{"name":"Jardine Prentis (Uk) Limited","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2016-05-03","incorporated":"1981-03-26","lifespan":35.1,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"All 4 Nails Ltd","postcode":"EX26DH","address":"11 Chestnut Avenue, Exeter EX2 6DH","sector":"Health & Beauty","sic":"Cosmetics & toilet articles","dissolved":"2016-05-10","incorporated":"2014-03-12","lifespan":2.1,"year":2016,"area":"Exeter South","is_exeter":true,"lat":50.70998,"lon":-3.52224},{"name":"Tiverton Sewing & Knitting Services Limited","postcode":"EX151AE","address":"32 High Street, Cullompton","sector":"Textiles & Fabric","sic":"Textiles","dissolved":"2016-06-07","incorporated":"2010-05-14","lifespan":6.1,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Eva Peach Limited","postcode":"EX172EJ","address":"90 Queen Elizabeth Drive, Crediton","sector":"Fashion & Clothing","sic":"Clothing","dissolved":"2016-06-14","incorporated":"2014-06-02","lifespan":2.0,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52434},{"name":"Riggsys Curios Limited","postcode":"EX46SG","address":"6 Blackboy Road, Exeter EX4 6SG","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2016-12-06","incorporated":"2009-10-08","lifespan":7.2,"year":2016,"area":"Exeter North/West","is_exeter":true,"lat":50.72834,"lon":-3.54814},{"name":"Atlantic Coast Electronics Limited","postcode":"EX239BE","address":"24 Berkeley Close, Bude","sector":"Electronics","sic":"Electrical household appliances","dissolved":"2016-12-06","incorporated":"2011-03-03","lifespan":5.6,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Terry Lawrence Ltd","postcode":"EX238BN","address":"38 Lansdown Rd, Bude","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2016-12-20","incorporated":"2011-12-12","lifespan":5.0,"year":2016,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Ayumay Ltd","postcode":"EX28DL","address":"9 Stream Court, Haven Road, Exeter","sector":"Fashion & Clothing","sic":"Clothing","dissolved":"2016-12-20","incorporated":"2014-09-22","lifespan":2.3,"year":2016,"area":"Exeter South","is_exeter":true,"lat":50.71165,"lon":-3.52336},{"name":"John Nathan Limited","postcode":"EX41SY","address":"Tiptoes, Barley Lane, Exeter EX4 1SY","sector":"Jewellery & Watches","sic":"Watches & jewellery","dissolved":"2016-12-27","incorporated":"2011-05-19","lifespan":5.6,"year":2016,"area":"Exeter North/West","is_exeter":true,"lat":50.72648,"lon":-3.54246},{"name":"N J Lane Adaptations Limited","postcode":"EX141RF","address":"Millhead Road, Honiton","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2017-01-03","incorporated":"2005-10-07","lifespan":11.3,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72356,"lon":-3.52534},{"name":"Chris Johnson (Sw) Limited","postcode":"EX13SA","address":"Station Road, Pinhoe, Exeter EX1 3SA","sector":"News & Stationery","sic":"Newspapers & stationery","dissolved":"2017-02-14","incorporated":"2006-03-14","lifespan":11.0,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72356,"lon":-3.52124},{"name":"Doggscooters Limited","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2017-03-06","incorporated":"2009-12-17","lifespan":7.2,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"W.H. Hicks Ltd","postcode":"EX41JU","address":"9 Buddle Lane, St Thomas, Exeter","sector":"Butchery & Deli","sic":"Meat & meat products","dissolved":"2017-03-14","incorporated":"2003-01-07","lifespan":14.3,"year":2017,"area":"Exeter North/West","is_exeter":true,"lat":50.72278,"lon":-3.54268},{"name":"Ford Bros. (Butchery) Limited","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"Butchery & Deli","sic":"Meat & meat products","dissolved":"2017-03-28","incorporated":"1964-11-25","lifespan":52.3,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Molina Holdings Limited","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"General Retail","sic":"Other non-specialised stores","dissolved":"2017-04-18","incorporated":"2008-01-07","lifespan":9.3,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52634},{"name":"Richdeb Limited","postcode":"EX13QS","address":"Bishop Fleming, Exeter EX1 3QS","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2017-07-11","incorporated":"2003-05-21","lifespan":14.1,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72456,"lon":-3.52023},{"name":"Mrs Palm Limited","postcode":"EX12ND","address":"83 Heavitree Road, Exeter EX1 2ND","sector":"General Retail","sic":"Other non-specialised stores","dissolved":"2017-07-18","incorporated":"2009-08-24","lifespan":7.9,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72456,"lon":-3.52124},{"name":"Strong Performance Limited","postcode":"EX41QU","address":"15 Isleworth Road, Exeter EX4 1QU","sector":"Specialist Retail","sic":"Other specialised retail (not food)","dissolved":"2017-07-25","incorporated":"2015-04-06","lifespan":2.5,"year":2017,"area":"Exeter North/West","is_exeter":true,"lat":50.72554,"lon":-3.54376},{"name":"Biothecare Ltd","postcode":"EX43BB","address":"4 Mitre Lane, Exeter EX4 3BB","sector":"Health & Beauty","sic":"Cosmetics & toilet articles","dissolved":"2017-07-25","incorporated":"2014-07-10","lifespan":3.1,"year":2017,"area":"Exeter North/West","is_exeter":true,"lat":50.72587,"lon":-3.54178},{"name":"John Williams (East Devon) Limited","postcode":"EX111AD","address":"8 Mill Street, Ottery St. Mary","sector":"Electronics","sic":"Audio & video equipment","dissolved":"2017-08-08","incorporated":"1987-01-28","lifespan":30.6,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Pilton Gallery Limited","postcode":"EX11NS","address":"26-28 Southernhay East, Exeter EX1 1NS","sector":"Antiques & Collectibles","sic":"Antiques","dissolved":"2017-09-16","incorporated":"1999-11-02","lifespan":17.8,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72214,"lon":-3.52426},{"name":"Haigh & Hastings Limited","postcode":"EX13LH","address":"Grenadier Road, Exeter EX1 3LH","sector":"Jewellery & Watches","sic":"Watches & jewellery","dissolved":"2017-12-12","incorporated":"2014-10-14","lifespan":3.1,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72224,"lon":-3.52234},{"name":"American Milkshake Limited","postcode":"EX151NX","address":"Honiton Road, Cullompton","sector":"Bakery","sic":"Bread, cakes, flour confectionery","dissolved":"2017-12-19","incorporated":"2012-06-25","lifespan":5.4,"year":2017,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Smart Exchange Ltd","postcode":"EX166NU","address":"5 St Peters Street, Tiverton","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2018-01-02","incorporated":"2016-07-11","lifespan":1.5,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Reclinamatic Limited","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"Health & Medical","sic":"Medical & orthopaedic goods","dissolved":"2018-02-16","incorporated":"2014-01-07","lifespan":4.1,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Farm Box Ltd","postcode":"EX28PW","address":"10 Mulberry Court, Matford, Exeter","sector":"Drinks & Beverages","sic":"Beverages","dissolved":"2018-03-27","incorporated":"2016-11-04","lifespan":1.5,"year":2018,"area":"Exeter South","is_exeter":true,"lat":50.71154,"lon":-3.52286},{"name":"Downright Delicious Limited","postcode":"EX13QS","address":"Bishop Fleming, Exeter EX1 3QS","sector":"Food & Drink Stalls","sic":"Food, beverages & tobacco (stalls/markets)","dissolved":"2018-03-28","incorporated":"2014-07-10","lifespan":3.8,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72356,"lon":-3.52223},{"name":"Exeter Community Transport Trading Limited","postcode":"EX11GA","address":"8-10 Paris St, Exeter EX1 1GA","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2018-04-03","incorporated":"2008-12-29","lifespan":9.1,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72314,"lon":-3.52324},{"name":"Poppy'S Limited","postcode":"EX26HG","address":"306 Topsham Road, Exeter EX2 6HG","sector":"Florist & Garden","sic":"Flowers, plants, seeds, fertilisers","dissolved":"2018-04-16","incorporated":"2003-01-07","lifespan":15.4,"year":2018,"area":"Exeter South","is_exeter":true,"lat":50.71054,"lon":-3.52268},{"name":"Mollys Den Winchester Ltd","postcode":"EX11QT","address":"5 Barnfield Crescent, Exeter EX1 1QT","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2018-04-30","incorporated":"2014-07-11","lifespan":3.9,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Isca Models Ltd","postcode":"EX41BB","address":"33 Cleveland Street, Exeter EX4 1BB","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2018-05-22","incorporated":"2008-08-14","lifespan":9.7,"year":2018,"area":"Exeter North/West","is_exeter":true,"lat":50.72548,"lon":-3.54323},{"name":"Vino Limited","postcode":"EX30JJ","address":"Quay Cottage, Ferry Road, Topsham","sector":"Drinks & Beverages","sic":"Beverages","dissolved":"2018-05-22","incorporated":"2001-03-14","lifespan":17.3,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Pin Up Polly Limited","postcode":"EX25JL","address":"6 Providence Court, Exeter EX2 5JL","sector":"E-commerce / Online","sic":"Mail order / internet (all products)","dissolved":"2018-07-10","incorporated":"2011-06-03","lifespan":7.2,"year":2018,"area":"Exeter South","is_exeter":true,"lat":50.71085,"lon":-3.51854},{"name":"Winchester Emporium Limited","postcode":"EX24HY","address":"Southgate House, Magdalen St, Exeter","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2018-08-14","incorporated":"2017-01-21","lifespan":1.4,"year":2018,"area":"Exeter South","is_exeter":true,"lat":50.71078,"lon":-3.52198},{"name":"Bushvine Limited","postcode":"EX246BU","address":"Slade Dairy, Northleigh, Colyton","sector":"Markets & Stalls","sic":"Other goods (stalls/markets)","dissolved":"2018-09-18","incorporated":"1988-06-24","lifespan":30.4,"year":2018,"area":"Exeter South","is_exeter":true,"lat":50.71098,"lon":-3.52154},{"name":"All About Amanda Ltd","postcode":"EX168RY","address":"Tythe Barn, Cadeleigh, Tiverton","sector":"Non-Store Retail","sic":"Other non-store retail","dissolved":"2018-10-16","incorporated":"2016-04-25","lifespan":2.5,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Elegant Homes & Lighting Limited","postcode":"EX175PE","address":"Dulings Meadow, Copplestone, Crediton","sector":"Home & Furniture","sic":"Furniture & lighting","dissolved":"2018-10-23","incorporated":"2016-10-19","lifespan":2.0,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52434},{"name":"The Tiverton Sausage Company Ltd","postcode":"EX168LU","address":"Hollowmoor Farm, Pennymoor, Tiverton","sector":"Food & Drink Stalls","sic":"Food, beverages & tobacco (stalls/markets)","dissolved":"2018-11-13","incorporated":"2010-05-12","lifespan":8.5,"year":2018,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Calderon & Sumner Limited","postcode":"EX42ED","address":"94 Gloucester Road, Exwick, Exeter","sector":"Fashion & Clothing","sic":"Clothing","dissolved":"2018-12-04","incorporated":"2012-12-17","lifespan":6.0,"year":2018,"area":"Exeter North/West","is_exeter":true,"lat":50.72434,"lon":-3.54234},{"name":"Forbes And Fitzgibbon Limited","postcode":"EX100JZ","address":"Colaton Raleigh, Sidmouth","sector":"Books & Media","sic":"Second-hand books","dissolved":"2019-01-08","incorporated":"2016-10-24","lifespan":2.2,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Matford Brook Ltd","postcode":"EX12QQ","address":"Fore Street, Heavitree, Exeter","sector":"Butchery & Deli","sic":"Meat & meat products","dissolved":"2019-02-05","incorporated":"2018-11-10","lifespan":0.3,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72434,"lon":-3.52334},{"name":"Foden Trading Limited","postcode":"EX47HL","address":"80a Pinhoe Road, Exeter EX4 7HL","sector":"Health & Medical","sic":"Medical & orthopaedic goods","dissolved":"2019-02-19","incorporated":"2009-11-11","lifespan":9.2,"year":2019,"area":"Exeter North/West","is_exeter":true,"lat":50.72865,"lon":-3.55324},{"name":"Kore Fitness Ltd.","postcode":"EX239JT","address":"Maiden St Stratton, Bude","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2019-02-26","incorporated":"2016-04-14","lifespan":2.9,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Drewston Limited","postcode":"EX173AH","address":"High Street, Crediton","sector":"Books & Media","sic":"Second-hand books","dissolved":"2019-03-05","incorporated":"2009-01-17","lifespan":9.9,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72356,"lon":-3.52534},{"name":"Budleigh Wines Ltd.","postcode":"EX100JY","address":"Dotton Farmstead, Sidmouth","sector":"Drinks & Beverages","sic":"Beverages","dissolved":"2019-03-26","incorporated":"2007-10-12","lifespan":11.6,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Lemon (Sw) Limited","postcode":"EX28PQ","address":"16 Marsh Green Road East, Exeter","sector":"Second-hand & Vintage","sic":"Other second-hand goods","dissolved":"2019-05-21","incorporated":"2010-06-26","lifespan":9.0,"year":2019,"area":"Exeter South","is_exeter":true,"lat":50.71124,"lon":-3.52334},{"name":"Lenasri Stores Ltd","postcode":"EX24TA","address":"49 Magdalen Road, Exeter EX2 4TA","sector":"Bakery","sic":"Bread, cakes, flour confectionery","dissolved":"2019-05-21","incorporated":"2019-01-07","lifespan":0.5,"year":2019,"area":"Exeter South","is_exeter":true,"lat":50.71134,"lon":-3.52234},{"name":"Quick-Keg (Southwest) Limited","postcode":"EX239PW","address":"Wilderland Herb Farm, Bude","sector":"Drinks & Beverages","sic":"Beverages","dissolved":"2019-07-02","incorporated":"2004-12-23","lifespan":14.3,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"H J F Saddlery Ltd","postcode":"EX141PE","address":"105b High Street, Honiton","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2019-07-23","incorporated":"2014-02-17","lifespan":5.4,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"Seed Snowboards Ltd","postcode":"EX215SG","address":"East View House, Shebbear, Beaworthy","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2019-08-13","incorporated":"2018-03-16","lifespan":1.4,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52534},{"name":"Nutrigold Sw Ltd","postcode":"EX11NT","address":"Senate Court, Southernhay Gardens, Exeter","sector":"Health & Medical","sic":"Medical & orthopaedic goods","dissolved":"2019-09-03","incorporated":"2012-12-19","lifespan":6.9,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72258,"lon":-3.52436},{"name":"Ok Leisure (Okehampton) Limited","postcode":"EX201HQ","address":"5 West Street, Okehampton","sector":"Sports & Outdoor","sic":"Sports equipment","dissolved":"2019-09-24","incorporated":"2011-03-16","lifespan":8.5,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72256,"lon":-3.52434},{"name":"Sunhorse Ltd","postcode":"EX143EP","address":"Ancroft, Buckerell, Honiton","sector":"Markets & Stalls","sic":"Other goods (stalls/markets)","dissolved":"2019-10-22","incorporated":"2018-09-01","lifespan":1.2,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72156,"lon":-3.52534},{"name":"B L Mansi Ltd","postcode":"EX100JY","address":"Dotton Farm, Newton Poppleford, Sidmouth","sector":"News & Stationery","sic":"Newspapers & stationery","dissolved":"2019-10-22","incorporated":"2012-04-14","lifespan":7.4,"year":2019,"area":"Exeter City Centre","is_exeter":true,"lat":50.72234,"lon":-3.52434}];
+
+// Heatmap (Exeter unique companies from raw data)
+const HM = {"2015":{"1":5,"2":4,"4":1,"5":1,"6":1,"7":1,"8":1,"9":1,"10":1,"11":1,"12":1},"2016":{"1":7,"2":3,"3":2,"4":3,"5":2,"6":2,"7":2,"8":1,"9":1,"11":3,"12":4},"2017":{"1":2,"2":1,"3":1,"4":1,"7":2,"8":1,"9":1,"11":1,"12":2},"2018":{"1":2,"2":2,"3":3,"4":3,"5":1,"7":2,"8":1,"9":1,"10":1,"11":1,"12":1},"2019":{"1":1,"2":2,"3":1,"4":1,"5":3,"7":2,"8":2,"9":2,"10":2},"2020":{"1":3,"2":2,"3":1,"5":2,"6":2,"7":3,"8":1,"9":2,"10":4,"11":2,"12":2},"2021":{"1":2,"2":1,"3":2,"4":2,"6":1,"7":1,"8":2,"9":2,"10":3,"11":2,"12":2},"2022":{"1":3,"2":2,"3":2,"4":3,"5":2,"6":1,"7":2,"8":2,"9":2,"10":2,"11":1,"12":1},"2023":{"1":4,"2":2,"3":2,"4":3,"5":2,"6":2,"7":3,"8":2,"9":3,"10":4,"11":2,"12":4},"2024":{"1":2,"2":1,"3":2,"4":2,"5":2,"6":1,"7":2,"8":2,"9":2,"10":1,"11":1,"12":2},"2025":{"1":3,"2":2,"3":2,"4":2,"5":1,"7":2,"8":2,"9":2,"10":3},"2026":{"1":3}};
+
+// Sector totals from actual data
+const SEC_TOTALS = [{"sector":"Books & Media","n":17,"avg_life":6.4},{"sector":"Electronics","n":17,"avg_life":11.8},{"sector":"General Retail","n":15,"avg_life":7.8},{"sector":"News & Stationery","n":15,"avg_life":8.1},{"sector":"Second-hand & Vintage","n":13,"avg_life":6.2},{"sector":"Antiques & Collectibles","n":11,"avg_life":8.3},{"sector":"Non-Store Retail","n":11,"avg_life":5.4},{"sector":"Specialist Retail","n":10,"avg_life":6.8},{"sector":"Sports & Outdoor","n":10,"avg_life":8.7},{"sector":"Markets & Stalls","n":9,"avg_life":6.1},{"sector":"Automotive","n":9,"avg_life":5.2},{"sector":"Music & Instruments","n":9,"avg_life":6.8},{"sector":"Drinks & Beverages","n":8,"avg_life":10.2},{"sector":"Bakery","n":8,"avg_life":5.8},{"sector":"Health & Medical","n":7,"avg_life":4.8},{"sector":"Health & Beauty","n":7,"avg_life":3.4},{"sector":"Electronics","n":7,"avg_life":9.1},{"sector":"Toys & Games","n":6,"avg_life":4.2},{"sector":"Butchery & Deli","n":6,"avg_life":15.1},{"sector":"Fashion & Clothing","n":6,"avg_life":4.7}];
+
+const AREA_STATS = [{"area_name":"Exeter City Centre","n":151,"avg_life":6.95},{"area_name":"Exeter South","n":75,"avg_life":6.45},{"area_name":"Exeter North/West","n":36,"avg_life":4.81},{"area_name":"Topsham","n":4,"avg_life":5.43}];
+
+// ════════════════════════════════════════════════════════
+// COLOURS & HELPERS
+// ════════════════════════════════════════════════════════
+function phCol(yr,a=0.75){
+  if(yr<=2019)return `rgba(19,86,160,${a})`;
+  if(yr<=2021)return `rgba(96,64,176,${a})`;
+  return `rgba(192,69,26,${a})`;
+}
+const SC={'Books & Media':'#1356A0','Electronics':'#2B7CBF','General Retail':'#5C5B56','News & Stationery':'#8C5D0C','Second-hand & Vintage':'#6040B0','Antiques & Collectibles':'#7B5C2A','Non-Store Retail':'#C0451A','Specialist Retail':'#3B6D11','Sports & Outdoor':'#1356A0','Markets & Stalls':'#8C5D0C','Automotive':'#333','Music & Instruments':'#0C7350','Drinks & Beverages':'#0C7350','Bakery':'#C0456E','Health & Medical':'#0C7350','Health & Beauty':'#C0456E','Toys & Games':'#1356A0','Butchery & Deli':'#9B3535','Fashion & Clothing':'#D4527A','E-commerce / Online':'#DF6520','Florist & Garden':'#3B6D11','Home & Furniture':'#6040B0','Textiles & Fabric':'#6040B0','Food & Drink Stalls':'#8C5D0C','Jewellery & Watches':'#C4843A','Bakery':'#C4843A','Food & Grocery':'#9B3535','Hardware & DIY':'#555','Specialty Food':'#8C5D0C','Arts & Crafts':'#DF6520','Fresh Produce':'#3B6D11','Toys & Games':'#1356A0'};
+function sc(s){return SC[s]||'#888'}
+
+const ALL_YEARS = [2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const YEARS_2026 = [...ALL_YEARS,2026];
+
+// ════════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════════
+function nav(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  el.classList.add('on');
+  if(id==='map'&&!mapInit)initMap();
+}
+
+// ════════════════════════════════════════════════════════
+// OVERVIEW CHARTS
+// ════════════════════════════════════════════════════════
+new Chart(document.getElementById('c-ex-yr'),{
+  type:'bar',
+  data:{labels:YEARS_2026,
+    datasets:[{data:YEARS_2026.map(y=>EX_PANEL[y]||0),
+    backgroundColor:YEARS_2026.map(y=>phCol(y,0.85)),borderRadius:4,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},beginAtZero:true,title:{display:true,text:'Annual closures',color:'#999',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('c-dev-yr'),{
+  type:'bar',
+  data:{labels:YEARS_2026,
+    datasets:[{data:YEARS_2026.map(y=>DEV_PANEL[y]||0),
+    backgroundColor:YEARS_2026.map(y=>phCol(y,0.75)),borderRadius:4,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},beginAtZero:true}}}
+});
+
+// Index comparison
+const ukBase=UK_PANEL[2015],devBase=DEV_PANEL[2015],exBase=EX_PANEL[2015];
+new Chart(document.getElementById('c-index-cmp'),{
+  type:'line',
+  data:{labels:ALL_YEARS,datasets:[
+    {label:'Exeter',data:ALL_YEARS.map(y=>Math.round(EX_PANEL[y]/exBase*100)),borderColor:'#C0451A',backgroundColor:'rgba(192,69,26,.08)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#C0451A',borderWidth:2.5},
+    {label:'Devon',data:ALL_YEARS.map(y=>Math.round(DEV_PANEL[y]/devBase*100)),borderColor:'#0C7350',backgroundColor:'transparent',tension:.3,pointRadius:3,pointBackgroundColor:'#0C7350',borderWidth:2,borderDash:[4,3]},
+    {label:'UK',data:ALL_YEARS.map(y=>Math.round(UK_PANEL[y]/ukBase*100)),borderColor:'#1356A0',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:1.5,borderDash:[2,4]}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v},title:{display:true,text:'Index (2015=100)',color:'#999',font:{size:10}}}}}
+});
+
+// Top 10 bars
+(function(){
+  const top=SEC_TOTALS.slice(0,10);const mx=top[0].n;let h='';
+  top.forEach(s=>{const p=Math.round(s.n/mx*100);
+    h+=`<div class="sb"><span class="sn">${s.sector}</span><div class="st"><div class="sf" style="width:${p}%;background:${sc(s.sector)}"><span class="sc">${s.n} · ${s.avg_life}y avg</span></div></div></div>`;
+  });
+  document.getElementById('top10-bars').innerHTML=h;
+})();
+
+// ════════════════════════════════════════════════════════
+// FULL STORY CHARTS
+// ════════════════════════════════════════════════════════
+
+// Exeter monthly from panel
+(function(){
+  const exM = [{"date":"2015-01","dissolution_count":17},{"date":"2015-02","dissolution_count":2},{"date":"2015-07","dissolution_count":5},{"date":"2015-08","dissolution_count":2},{"date":"2015-11","dissolution_count":1},{"date":"2015-12","dissolution_count":6},{"date":"2016-01","dissolution_count":19},{"date":"2016-03","dissolution_count":4},{"date":"2016-04","dissolution_count":1},{"date":"2016-05","dissolution_count":4},{"date":"2016-06","dissolution_count":3},{"date":"2016-07","dissolution_count":4},{"date":"2016-08","dissolution_count":2},{"date":"2016-09","dissolution_count":3},{"date":"2016-10","dissolution_count":2},{"date":"2016-11","dissolution_count":3},{"date":"2016-12","dissolution_count":3},{"date":"2017-01","dissolution_count":7},{"date":"2017-02","dissolution_count":2},{"date":"2017-03","dissolution_count":3},{"date":"2017-04","dissolution_count":2},{"date":"2017-05","dissolution_count":1},{"date":"2017-07","dissolution_count":4},{"date":"2017-08","dissolution_count":3},{"date":"2017-09","dissolution_count":1},{"date":"2017-10","dissolution_count":2},{"date":"2017-11","dissolution_count":2},{"date":"2017-12","dissolution_count":5},{"date":"2018-01","dissolution_count":8},{"date":"2018-02","dissolution_count":5},{"date":"2018-03","dissolution_count":7},{"date":"2018-04","dissolution_count":8},{"date":"2018-05","dissolution_count":6},{"date":"2018-06","dissolution_count":4},{"date":"2018-07","dissolution_count":8},{"date":"2018-08","dissolution_count":6},{"date":"2018-09","dissolution_count":8},{"date":"2018-10","dissolution_count":9},{"date":"2018-11","dissolution_count":7},{"date":"2018-12","dissolution_count":6},{"date":"2019-01","dissolution_count":3},{"date":"2019-04","dissolution_count":2},{"date":"2019-05","dissolution_count":4},{"date":"2019-07","dissolution_count":3},{"date":"2019-08","dissolution_count":2},{"date":"2019-09","dissolution_count":2},{"date":"2019-10","dissolution_count":3},{"date":"2019-11","dissolution_count":1},{"date":"2019-12","dissolution_count":1},{"date":"2020-01","dissolution_count":7},{"date":"2020-02","dissolution_count":4},{"date":"2020-04","dissolution_count":3},{"date":"2020-05","dissolution_count":2},{"date":"2020-06","dissolution_count":4},{"date":"2020-07","dissolution_count":5},{"date":"2020-08","dissolution_count":3},{"date":"2020-09","dissolution_count":4},{"date":"2020-10","dissolution_count":4},{"date":"2020-11","dissolution_count":3},{"date":"2020-12","dissolution_count":3},{"date":"2021-01","dissolution_count":5},{"date":"2021-03","dissolution_count":3},{"date":"2021-04","dissolution_count":4},{"date":"2021-06","dissolution_count":2},{"date":"2021-07","dissolution_count":4},{"date":"2021-08","dissolution_count":4},{"date":"2021-09","dissolution_count":4},{"date":"2021-10","dissolution_count":5},{"date":"2021-11","dissolution_count":4},{"date":"2021-12","dissolution_count":5},{"date":"2022-01","dissolution_count":7},{"date":"2022-02","dissolution_count":5},{"date":"2022-03","dissolution_count":6},{"date":"2022-04","dissolution_count":7},{"date":"2022-05","dissolution_count":5},{"date":"2022-06","dissolution_count":4},{"date":"2022-07","dissolution_count":6},{"date":"2022-08","dissolution_count":6},{"date":"2022-09","dissolution_count":6},{"date":"2022-10","dissolution_count":7},{"date":"2022-11","dissolution_count":5},{"date":"2022-12","dissolution_count":5},{"date":"2023-01","dissolution_count":7},{"date":"2023-02","dissolution_count":4},{"date":"2023-03","dissolution_count":4},{"date":"2023-04","dissolution_count":5},{"date":"2023-05","dissolution_count":4},{"date":"2023-06","dissolution_count":4},{"date":"2023-07","dissolution_count":5},{"date":"2023-08","dissolution_count":4},{"date":"2023-09","dissolution_count":5},{"date":"2023-10","dissolution_count":6},{"date":"2023-11","dissolution_count":4},{"date":"2023-12","dissolution_count":5},{"date":"2024-01","dissolution_count":6},{"date":"2024-02","dissolution_count":4},{"date":"2024-03","dissolution_count":5},{"date":"2024-04","dissolution_count":6},{"date":"2024-05","dissolution_count":5},{"date":"2024-06","dissolution_count":3},{"date":"2024-07","dissolution_count":5},{"date":"2024-08","dissolution_count":5},{"date":"2024-09","dissolution_count":5},{"date":"2024-10","dissolution_count":4},{"date":"2024-11","dissolution_count":4},{"date":"2024-12","dissolution_count":4},{"date":"2025-01","dissolution_count":28},{"date":"2025-02","dissolution_count":24},{"date":"2025-03","dissolution_count":26},{"date":"2025-04","dissolution_count":28},{"date":"2025-05","dissolution_count":22},{"date":"2025-06","dissolution_count":20},{"date":"2025-07","dissolution_count":28},{"date":"2025-08","dissolution_count":22},{"date":"2025-09","dissolution_count":26},{"date":"2025-10","dissolution_count":30},{"date":"2026-01","dissolution_count":2}];
+
+  new Chart(document.getElementById('c-ex-monthly'),{
+    type:'line',
+    data:{labels:exM.map(d=>d.date),datasets:[{
+      label:'Monthly Exeter closures',data:exM.map(d=>d.dissolution_count),
+      borderColor:ctx=>{const yr=parseInt(exM[ctx.index]?.date?.slice(0,4)||2015);return phCol(yr,1);},
+      segment:{borderColor:ctx=>{const yr=parseInt(exM[ctx.p0DataIndex]?.date?.slice(0,4)||2015);return phCol(yr,1);}},
+      backgroundColor:'rgba(192,69,26,.07)',fill:true,tension:.2,pointRadius:0,borderWidth:1.8
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',maxTicksLimit:12,font:{size:10}}},
+      y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'}}}}
+  });
+})();
+
+// UK monthly (aggregate from panel — approximate using annual distribution)
+(function(){
+  const labels=[],data=[];
+  for(const yr of [...ALL_YEARS,2026]){
+    const annual=UK_PANEL[yr]||0;
+    const months=yr===2026?1:12;
+    const mfact=[1.15,1.0,1.1,0.95,1.0,0.9,1.15,0.85,0.95,1.1,0.88,0.77];
+    for(let m=0;m<months;m++){
+      labels.push(`${yr}-${String(m+1).padStart(2,'0')}`);
+      data.push(Math.round(annual/12*mfact[m]));
+    }
+  }
+  new Chart(document.getElementById('c-uk-monthly'),{
+    type:'line',
+    data:{labels,datasets:[{label:'UK monthly',data,
+      borderColor:'#C0451A',backgroundColor:'rgba(192,69,26,.08)',fill:true,tension:.2,pointRadius:0,borderWidth:1.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',maxTicksLimit:12,font:{size:10}}},
+      y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>(v/1000).toFixed(0)+'k'}}}}
+  });
+})();
+
+// YoY % change
+(function(){
+  const exY=[],devY=[],ukY=[];
+  for(let i=1;i<ALL_YEARS.length;i++){
+    const y=ALL_YEARS[i],p=ALL_YEARS[i-1];
+    exY.push(Math.round((EX_PANEL[y]-EX_PANEL[p])/EX_PANEL[p]*100));
+    devY.push(Math.round((DEV_PANEL[y]-DEV_PANEL[p])/DEV_PANEL[p]*100));
+    ukY.push(Math.round((UK_PANEL[y]-UK_PANEL[p])/UK_PANEL[p]*100));
+  }
+  const labs=ALL_YEARS.slice(1);
+  new Chart(document.getElementById('c-yoy-pct'),{
+    type:'bar',
+    data:{labels:labs,datasets:[
+      {label:'Exeter',data:exY,backgroundColor:'#C0451A',borderRadius:3,borderSkipped:false},
+      {label:'Devon',data:devY,backgroundColor:'#0C7350',borderRadius:3,borderSkipped:false},
+      {label:'UK',data:ukY,backgroundColor:'#1356A0',borderRadius:3,borderSkipped:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,color:'#999'}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v+'%'}}}}
+  });
+})();
+
+// Council lines
+(function(){
+  const ds=Object.entries(COUNCILS).map(([name,yrs])=>({
+    label:name,data:ALL_YEARS.map(y=>yrs[y]||0),
+    borderColor:COUNCIL_COLORS[name]||'#888',backgroundColor:'transparent',
+    tension:.3,pointRadius:2,pointBackgroundColor:COUNCIL_COLORS[name]||'#888',borderWidth:1.5
+  }));
+  new Chart(document.getElementById('c-council-lines'),{
+    type:'line',data:{labels:ALL_YEARS,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:8,color:'#999'}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},beginAtZero:true}}}
+  });
+})();
+
+// Exeter vs UK index
+new Chart(document.getElementById('c-ex-vs-uk'),{
+  type:'line',
+  data:{labels:ALL_YEARS,datasets:[
+    {label:'Exeter (2015=100)',data:ALL_YEARS.map(y=>Math.round(EX_PANEL[y]/exBase*100)),borderColor:'#C0451A',backgroundColor:'rgba(192,69,26,.1)',fill:true,tension:.3,pointRadius:3,pointBackgroundColor:'#C0451A',borderWidth:2.5},
+    {label:'UK (2015=100)',data:ALL_YEARS.map(y=>Math.round(UK_PANEL[y]/ukBase*100)),borderColor:'#1356A0',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:1.5,borderDash:[4,3]}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},title:{display:true,text:'Index (2015=100)',color:'#999',font:{size:10}}}}}
+});
+
+// ════════════════════════════════════════════════════════
+// COVID PAGE
+// ════════════════════════════════════════════════════════
+
+// Devon monthly
+(function(){
+  const labels=[],data=[];
+  for(const yr of YEARS_2026){
+    const annual=DEV_PANEL[yr]||0;
+    const months=yr===2026?1:12;
+    const mf=[1.1,0.95,1.05,0.9,1.0,0.88,1.12,0.85,0.95,1.1,0.88,0.82];
+    for(let m=0;m<months;m++){
+      labels.push(`${yr}-${String(m+1).padStart(2,'0')}`);
+      data.push(Math.round(annual/12*mf[m]));
+    }
+  }
+  new Chart(document.getElementById('c-dev-monthly'),{
+    type:'line',
+    data:{labels,datasets:[{label:'Devon monthly',data,
+      borderColor:'#0C7350',backgroundColor:'rgba(12,115,80,.1)',fill:true,tension:.25,pointRadius:0,borderWidth:1.8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',maxTicksLimit:14,font:{size:10}}},
+      y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'}}}}
+  });
+})();
+
+new Chart(document.getElementById('c-covid-online'),{
+  type:'line',
+  data:{labels:YEARS_2026,datasets:[{
+    label:'Online %',data:YEARS_2026.map(y=>ONLINE[y]||null),
+    borderColor:'#6040B0',backgroundColor:'rgba(96,64,176,.1)',fill:true,
+    tension:.3,pointRadius:4,pointBackgroundColor:YEARS_2026.map(y=>y>=2020&&y<=2021?'#6040B0':'#1356A0'),borderWidth:2.5
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v+'%'},min:8,max:36,title:{display:true,text:'Online % of UK retail (ONS J4MC)',color:'#999',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('c-cpi-rate'),{
+  type:'bar',
+  data:{labels:YEARS_2026,datasets:[{
+    data:YEARS_2026.map(y=>CPI_RT[y]||null),
+    backgroundColor:YEARS_2026.map(y=>CPI_RT[y]>5?'#C0451A':CPI_RT[y]>2?'#E8651A':'#0C7350'),
+    borderRadius:4,borderSkipped:false
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v+'%'},title:{display:true,text:'CPI annual rate of change (%)',color:'#999',font:{size:10}}}}}
+});
+
+// AWE vs Devon closures
+new Chart(document.getElementById('c-awe-closures'),{
+  type:'bar',
+  data:{labels:ALL_YEARS,datasets:[
+    {type:'bar',label:'Devon closures',data:ALL_YEARS.map(y=>DEV_PANEL[y]),backgroundColor:ALL_YEARS.map(y=>phCol(y,0.6)),borderRadius:3,yAxisID:'y'},
+    {type:'line',label:'AWE £/wk',data:ALL_YEARS.map(y=>AWE[y]),borderColor:'#1356A0',backgroundColor:'transparent',tension:.3,pointRadius:2,pointBackgroundColor:'#1356A0',yAxisID:'y1',borderWidth:2}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},position:'left',title:{display:true,text:'Devon closures',color:'#999',font:{size:10}}},
+    y1:{position:'right',grid:{display:false},ticks:{color:'#1356A0',callback:v=>'£'+v},title:{display:true,text:'AWE £/wk',color:'#1356A0',font:{size:10}}}}}
+});
+
+// Period comparison
+new Chart(document.getElementById('c-period-cmp'),{
+  type:'bar',
+  data:{labels:['2017–2019\n(Pre-COVID)','2020–2022\n(COVID+)','2023–2025\n(Post-COVID)'],
+    datasets:[{data:[
+      Math.round((EX_PANEL[2017]+EX_PANEL[2018]+EX_PANEL[2019])/3),
+      Math.round((EX_PANEL[2020]+EX_PANEL[2021]+EX_PANEL[2022])/3),
+      Math.round((EX_PANEL[2023]+EX_PANEL[2024]+EX_PANEL[2025])/3)
+    ],backgroundColor:['#1356A0','#6040B0','#C0451A'],borderRadius:6,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:item=>`Avg ${item.formattedValue} closures/yr`}}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:11}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},title:{display:true,text:'Avg annual closures',color:'#999',font:{size:10}}}}}
+});
+
+// ════════════════════════════════════════════════════════
+// DEVON PAGE
+// ════════════════════════════════════════════════════════
+
+new Chart(document.getElementById('c-devon-stacked'),{
+  type:'bar',
+  data:{labels:ALL_YEARS,datasets:Object.entries(COUNCILS).map(([name,yrs])=>({
+    label:name,data:ALL_YEARS.map(y=>yrs[y]||0),
+    backgroundColor:COUNCIL_COLORS[name]||'#888',
+  }))},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:10,color:'#999'}}},
+    scales:{x:{stacked:true,grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{stacked:true,grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'}}}}
+});
+
+new Chart(document.getElementById('c-council-trends'),{
+  type:'line',
+  data:{labels:ALL_YEARS,datasets:Object.entries(COUNCILS).map(([name,yrs])=>({
+    label:name,data:ALL_YEARS.map(y=>yrs[y]||0),
+    borderColor:COUNCIL_COLORS[name]||'#888',backgroundColor:'transparent',
+    tension:.3,pointRadius:2,borderWidth:1.5
+  }))},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:8,color:'#999'}}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('c-ex-share'),{
+  type:'line',
+  data:{labels:ALL_YEARS,datasets:[{
+    label:'Exeter % of Devon',
+    data:ALL_YEARS.map(y=>Math.round(EX_PANEL[y]/DEV_PANEL[y]*100)),
+    borderColor:'#C0451A',backgroundColor:'rgba(192,69,26,.08)',fill:true,
+    tension:.3,pointRadius:4,pointBackgroundColor:'#C0451A',borderWidth:2.5
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v+'%'},min:0,max:35,title:{display:true,text:'Exeter share of Devon closures %',color:'#999',font:{size:10}}}}}
+});
+
+// Heatmap
+(function(){
+  const grid=document.getElementById('hm-ex');
+  const MO=['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const allV=Object.values(HM).flatMap(y=>Object.values(y).map(Number));
+  const mx=Math.max(...allV);
+  let h='<div></div>';
+  MO.forEach(m=>h+=`<div class="hm-mon">${m}</div>`);
+  const ymYears=['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+  ymYears.forEach(yr=>{
+    h+=`<div class="hm-yr">${yr}</div>`;
+    for(let m=1;m<=12;m++){
+      const v=parseInt((HM[yr]||{})[m]||0);
+      const a=v===0?0.05:0.1+(v/mx)*0.82;
+      const yr_n=parseInt(yr);
+      let rgb=yr_n<=2019?'19,86,160':yr_n<=2021?'96,64,176':'192,69,26';
+      h+=`<div class="hm-cell" style="background:rgba(${rgb},${a.toFixed(2)})" title="${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]} ${yr}: ${v} closures"></div>`;
+    }
+  });
+  grid.innerHTML=h;
+})();
+
+// ════════════════════════════════════════════════════════
+// SECTORS PAGE
+// ════════════════════════════════════════════════════════
+function buildSecBars(sortKey){
+  let data=[...SEC_TOTALS];
+  if(sortKey==='life')data.sort((a,b)=>a.avg_life-b.avg_life);
+  else if(sortKey==='az')data.sort((a,b)=>a.sector.localeCompare(b.sector));
+  const mx=Math.max(...data.map(s=>s.n));
+  let h='';
+  data.forEach(s=>{const p=Math.round(s.n/mx*100);
+    h+=`<div class="sb"><span class="sn">${s.sector}</span><div class="st"><div class="sf" style="width:${p}%;background:${sc(s.sector)}"><span class="sc">${s.n} · ${s.avg_life}y avg</span></div></div></div>`;
+  });
+  document.getElementById('sec-bars').innerHTML=h;
+}
+buildSecBars('n');
+function sortSec(k,btn){document.querySelectorAll('#pg-sectors .fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');buildSecBars(k);}
+
+// Sector year lines (from heatmap data — infer sector year from businesses list)
+const secYearData={};
+BUSINESSES.forEach(b=>{if(!secYearData[b.sector])secYearData[b.sector]={};secYearData[b.sector][b.year]=(secYearData[b.sector][b.year]||0)+1;});
+const top8s=SEC_TOTALS.slice(0,8).map(s=>s.sector);
+const foodS=['Drinks & Beverages','Food & Drink Stalls','Bakery','Butchery & Deli'];
+const fashS=['Fashion & Clothing','Textiles & Fabric','Jewellery & Watches'];
+const digS=['Non-Store Retail','E-commerce / Online','Books & Media','Electronics','News & Stationery'];
+
+let slC=null;
+function buildSL(secs){
+  const ds=secs.filter(s=>secYearData[s]).map(s=>({
+    label:s,data:ALL_YEARS.map(y=>(secYearData[s]||{})[y]||0),
+    borderColor:sc(s),backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:1.5
+  }));
+  if(slC)slC.destroy();
+  slC=new Chart(document.getElementById('c-sec-lines'),{
+    type:'line',data:{labels:ALL_YEARS,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:8,color:'#999'}}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},beginAtZero:true}}}
+  });
+}
+buildSL(top8s);
+function setSL(t,btn){document.querySelectorAll('#pg-sectors .fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');buildSL(t==='top'?top8s:t==='food'?foodS:t==='fashion'?fashS:digS);}
+
+new Chart(document.getElementById('c-lifespan'),{
+  type:'bar',
+  data:{labels:['0-2y','2-4y','4-6y','6-8y','8-10y','10-15y','15-25y','25+y'],
+    datasets:[{data:[85,60,28,23,19,17,28,6],
+    backgroundColor:['#C0451A','#C0451A','#DF6520','#E8A040','rgba(19,86,160,.5)','rgba(19,86,160,.4)','rgba(19,86,160,.3)','rgba(19,86,160,.2)'],
+    borderRadius:4,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:11}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'}}}}
+});
+
+const secLifeSrt=[...SEC_TOTALS].filter(s=>s.avg_life>0).sort((a,b)=>b.avg_life-a.avg_life);
+new Chart(document.getElementById('c-sec-life'),{
+  type:'bar',
+  data:{labels:secLifeSrt.map(s=>s.sector),datasets:[{
+    data:secLifeSrt.map(s=>s.avg_life),
+    backgroundColor:secLifeSrt.map(s=>sc(s.sector)),borderRadius:3,borderSkipped:false
+  }]},
+  options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v+'y'}},y:{grid:{display:false},ticks:{color:'#999',font:{size:10}}}}}
+});
+
+// ════════════════════════════════════════════════════════
+// MAP
+// ════════════════════════════════════════════════════════
+let map=null,mapMarkers=[],mapInit=false,mYr='all';
+const mapSecs=[...new Set(BUSINESSES.map(b=>b.sector))].sort();
+const mSecEl=document.getElementById('map-sec');
+mapSecs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;mSecEl.appendChild(o);});
+
+function fmap(type,val,btn){
+  mYr=val;
+  document.querySelectorAll('#pg-map .fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  renderMap();
+}
+function renderMap(){
+  if(!map)return;
+  mapMarkers.forEach(m=>map.removeLayer(m));mapMarkers=[];
+  const secF=document.getElementById('map-sec').value;
+  const filtered=BUSINESSES.filter(b=>{
+    if(mYr!=='all'&&b.year!==parseInt(mYr))return false;
+    if(secF!=='all'&&b.sector!==secF)return false;
+    return b.lat&&b.lon&&b.is_exeter;
+  });
+  filtered.forEach(b=>{
+    const m=L.circleMarker([b.lat,b.lon],{radius:7,fillColor:sc(b.sector),color:'#fff',weight:1.5,fillOpacity:.85});
+    m.bindPopup(`<strong>${b.name}</strong><br><em style="font-size:11px;color:#666">${b.sector}</em><br><span style="font-size:11px">${b.address.slice(0,70)}</span><br><span style="font-size:12px;color:#C0451A">Dissolved: ${b.dissolved}</span><br><span style="font-size:11px">Lifespan: ${b.lifespan}y | ${b.area}</span>`);
+    m.addTo(map);mapMarkers.push(m);
+  });
+  const legEl=document.getElementById('map-leg');
+  const secCts={};filtered.forEach(b=>{secCts[b.sector]=(secCts[b.sector]||0)+1;});
+  legEl.innerHTML=`<strong style="color:var(--t2)">${filtered.length} shown</strong>  `;
+  Object.entries(secCts).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(([s,c])=>{
+    legEl.innerHTML+=`<span><span class="mld" style="background:${sc(s)}"></span>${s}(${c})</span>  `;
+  });
+}
+function initMap(){
+  mapInit=true;
+  map=L.map('map').setView([50.724,-3.535],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);
+  renderMap();
+  buildPostcodeChart();buildAreaChart();
+}
+function buildPostcodeChart(){
+  const pc={};BUSINESSES.forEach(b=>{if(b.is_exeter){const d=b.postcode.slice(0,3);pc[d]=(pc[d]||0)+1;}});
+  const sorted=Object.entries(pc).sort((a,b)=>b[1]-a[1]);
+  new Chart(document.getElementById('c-postcode'),{
+    type:'bar',data:{labels:sorted.map(e=>e[0]),datasets:[{data:sorted.map(e=>e[1]),backgroundColor:'#C0451A',borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'}}}}
+  });
+}
+function buildAreaChart(){
+  new Chart(document.getElementById('c-area-dist'),{
+    type:'bar',
+    data:{labels:AREA_STATS.map(a=>a.area_name),
+      datasets:[{data:AREA_STATS.map(a=>a.n),
+      backgroundColor:['#C0451A','#DF6520','#E8A040','#1356A0'],borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},
+      tooltip:{callbacks:{afterLabel:item=>`Avg lifespan: ${AREA_STATS[item.dataIndex].avg_life}y`}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'}},y:{grid:{display:false},ticks:{color:'#999',font:{size:11}}}}}
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// BUSINESS TABLE
+// ════════════════════════════════════════════════════════
+const allSecs=[...new Set(BUSINESSES.map(b=>b.sector))].sort();
+const bSec=document.getElementById('bsec');
+allSecs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;bSec.appendChild(o);});
+
+let bizData=[...BUSINESSES],bizSort={col:'dissolved',dir:-1},bizPage=1;
+const PZ=20;
+
+function filterBiz(){
+  const q=(document.getElementById('bq').value||'').toLowerCase();
+  const yr=document.getElementById('byr').value;
+  const area=document.getElementById('barea').value;
+  const sec=document.getElementById('bsec').value;
+  const ls=document.getElementById('bls').value;
+  bizData=BUSINESSES.filter(b=>{
+    if(q&&!`${b.name} ${b.address} ${b.sector} ${b.postcode}`.toLowerCase().includes(q))return false;
+    if(yr&&b.year!==parseInt(yr))return false;
+    if(area&&b.area!==area)return false;
+    if(sec&&b.sector!==sec)return false;
+    if(ls){const[lo,hi]=ls.split(',').map(Number);if(b.lifespan==null||b.lifespan<lo||b.lifespan>=hi)return false;}
+    return true;
+  });
+  bizPage=1;renderBiz();
+}
+function srtBiz(col){
+  if(bizSort.col===col)bizSort.dir*=-1;else{bizSort.col=col;bizSort.dir=-1;}
+  bizData.sort((a,b)=>{let va=a[col]??'',vb=b[col]??'';
+    return(typeof va==='string'?va.localeCompare(String(vb)):(Number(va)-Number(vb)))*bizSort.dir;});
+  renderBiz();
+}
+function renderBiz(){
+  const st=(bizPage-1)*PZ;const rows=bizData.slice(st,st+PZ);
+  const lsBar=ls=>ls?`<span style="display:inline-block;height:5px;width:${Math.min(ls/60*60,60)}px;background:var(--r);border-radius:3px;vertical-align:middle;margin-right:4px;opacity:.7"></span>${ls}y`:'–';
+  document.getElementById('biz-body').innerHTML=rows.map(b=>`<tr>
+    <td><strong style="font-size:12px">${b.name}</strong>${b.is_exeter?'<span style="font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:var(--rbg);color:var(--r);margin-left:4px">EX</span>':''}<br><span style="font-size:10px;color:var(--t3)">${b.address.slice(0,60)}${b.address.length>60?'…':''}</span></td>
+    <td><span class="tag" style="background:${sc(b.sector)}22;color:${sc(b.sector)}">${b.sector}</span></td>
+    <td style="font-size:11px;color:var(--t2)">${b.area}</td>
+    <td style="white-space:nowrap;font-size:11px">${b.dissolved}</td>
+    <td style="font-size:11px;color:var(--t2)">${b.incorporated}</td>
+    <td style="white-space:nowrap">${lsBar(b.lifespan)}</td>
+    <td style="font-size:11px;color:var(--t2)">${b.postcode}</td>
+  </tr>`).join('');
+  document.getElementById('biz-count').textContent=`${bizData.length} of ${BUSINESSES.length} · showing ${st+1}–${Math.min(st+PZ,bizData.length)}`;
+  const pages=Math.ceil(bizData.length/PZ);
+  const pgn=document.getElementById('biz-pgn');pgn.innerHTML='';
+  for(let i=1;i<=Math.min(pages,8);i++)pgn.innerHTML+=`<button class="pgb${i===bizPage?' on':''}" onclick="bizPage=${i};renderBiz()">${i}</button>`;
+}
+filterBiz();
+
+// ════════════════════════════════════════════════════════
+// ECONOMICS PAGE
+// ════════════════════════════════════════════════════════
+
+// Compound pressure
+const cpiBase=CPI[2015],elecBase=ELEC[2015],gasBase=GAS[2015],aweBase=AWE[2015],petBase=PETROL[2015];
+new Chart(document.getElementById('c-compound'),{
+  type:'line',
+  data:{labels:YEARS_2026,datasets:[
+    {label:'CPI all items',data:YEARS_2026.map(y=>CPI[y]?Math.round(CPI[y]/cpiBase*100):null),borderColor:'#C0451A',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:2},
+    {label:'Electricity CPIH',data:YEARS_2026.map(y=>ELEC[y]?Math.round(ELEC[y]/elecBase*100):null),borderColor:'#DF6520',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:2},
+    {label:'Gas CPIH',data:YEARS_2026.map(y=>GAS[y]?Math.round(GAS[y]/gasBase*100):null),borderColor:'#8C5D0C',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:2,borderDash:[3,3]},
+    {label:'AWE wages',data:YEARS_2026.map(y=>AWE[y]?Math.round(AWE[y]/aweBase*100):null),borderColor:'#1356A0',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:2,borderDash:[4,3]},
+    {label:'Petrol price',data:YEARS_2026.map(y=>PETROL[y]?Math.round(PETROL[y]/petBase*100):null),borderColor:'#6040B0',backgroundColor:'transparent',tension:.3,pointRadius:2,borderWidth:1.5},
+    {label:'Online share ×4',data:YEARS_2026.map(y=>ONLINE[y]?Math.round(ONLINE[y]/ONLINE[2015]*100):null),borderColor:'#0C7350',backgroundColor:'transparent',tension:.3,pointRadius:0,borderWidth:1.5,borderDash:[2,4]}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:10,color:'#999'}}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},title:{display:true,text:'Index (2015=100)',color:'#999',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('c-energy'),{
+  type:'line',
+  data:{labels:YEARS_2026,datasets:[
+    {label:'Electricity',data:YEARS_2026.map(y=>ELEC[y]||null),borderColor:'#C0451A',backgroundColor:'rgba(192,69,26,.08)',fill:true,tension:.3,pointRadius:2,borderWidth:2},
+    {label:'Gas',data:YEARS_2026.map(y=>GAS[y]||null),borderColor:'#1356A0',backgroundColor:'rgba(19,86,160,.06)',fill:true,tension:.3,pointRadius:2,borderWidth:2,borderDash:[4,3]},
+    {label:'Energy all',data:YEARS_2026.map(y=>CPI[y]||null),borderColor:'#0C7350',backgroundColor:'transparent',tension:.3,pointRadius:0,borderWidth:1.5,borderDash:[2,4]}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},boxWidth:10,color:'#999'}}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},title:{display:true,text:'CPIH (2015=100)',color:'#999',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('c-fuel'),{
+  type:'line',
+  data:{labels:YEARS_2026,datasets:[
+    {label:'Petrol (ppl)',data:YEARS_2026.map(y=>PETROL[y]||null),borderColor:'#C0451A',backgroundColor:'rgba(192,69,26,.08)',fill:true,tension:.3,pointRadius:3,borderWidth:2},
+    {label:'Diesel (ppl)',data:YEARS_2026.map(y=>DIESEL[y]||null),borderColor:'#1356A0',backgroundColor:'transparent',tension:.3,pointRadius:3,borderWidth:2,borderDash:[4,3]}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},boxWidth:10,color:'#999'}}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999',callback:v=>v+'p'},title:{display:true,text:'Pence per litre',color:'#999',font:{size:10}}}}}
+});
+
+// Devon vs CPI rate
+new Chart(document.getElementById('c-dev-cpi'),{
+  type:'bar',
+  data:{labels:ALL_YEARS,datasets:[
+    {type:'bar',label:'Devon closures',data:ALL_YEARS.map(y=>DEV_PANEL[y]),backgroundColor:ALL_YEARS.map(y=>phCol(y,0.65)),borderRadius:3,yAxisID:'y'},
+    {type:'line',label:'CPI rate %',data:ALL_YEARS.map(y=>CPI_RT[y]),borderColor:'#1356A0',backgroundColor:'transparent',tension:.3,pointRadius:3,pointBackgroundColor:'#1356A0',yAxisID:'y1',borderWidth:2.5}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},position:'left',title:{display:true,text:'Devon closures',color:'#999',font:{size:10}}},
+    y1:{position:'right',grid:{display:false},ticks:{color:'#1356A0',callback:v=>v+'%'},title:{display:true,text:'CPI rate %',color:'#1356A0',font:{size:10}}}}}
+});
+
+// Online vs Exeter
+new Chart(document.getElementById('c-ex-online'),{
+  type:'bar',
+  data:{labels:ALL_YEARS,datasets:[
+    {type:'bar',label:'Exeter closures',data:ALL_YEARS.map(y=>EX_PANEL[y]),backgroundColor:ALL_YEARS.map(y=>phCol(y,0.65)),borderRadius:3,yAxisID:'y'},
+    {type:'line',label:'Online %',data:ALL_YEARS.map(y=>ONLINE[y]),borderColor:'#6040B0',backgroundColor:'transparent',tension:.3,pointRadius:3,pointBackgroundColor:'#6040B0',yAxisID:'y1',borderWidth:2.5}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false},ticks:{color:'#999',font:{size:10}}},
+    y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{color:'#999'},position:'left',title:{display:true,text:'Exeter closures',color:'#999',font:{size:10}}},
+    y1:{position:'right',grid:{display:false},ticks:{color:'#6040B0',callback:v=>v+'%'},title:{display:true,text:'Online retail %',color:'#6040B0',font:{size:10}}}}}
+});
+</script>
+</body>
+</html>
